@@ -18,7 +18,7 @@ typedef enum
     t_num_hexadecimal,
     t_num_decimal,
     t_num_octal,
-    t_num_boolean,
+    t_num_binary,
     t_string,
     t_none
 } type_t;
@@ -37,9 +37,11 @@ private:
     bool m_input_available;
     bool m_output_generated;
     bool m_output_updated;
+    bool m_verbose;
 
     void parse_data(void);
     void add_to_bin_output(const type_t stype, const endianess_t etype, const std::string &s);
+    void bb_log(std::string msg);
 
 public:
     BinBuidler();
@@ -47,10 +49,11 @@ public:
     BinBuidler(std::string &s);
     BinBuidler(std::stringstream &s);
     virtual ~BinBuidler();
+    void set_verbosity(bool activation);
     void set_input(const std::stringstream &input);
     void set_input(const std::string &input);
-    bool buildbin(const std::stringstream &input);
-    bool buildbin(const std::string &input);
+    /*bool buildbin(const std::stringstream &input);
+    bool buildbin(const std::string &input);*/
     bool buildbin(void);
     bool get_binary(std::vector<char> &output) const;
 };

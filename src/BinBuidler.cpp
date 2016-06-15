@@ -14,12 +14,24 @@
 
 #include "BinBuidler.h"
 
+
+#define MAX_U32b_VALUE 0x00000000FFFFFFFFUL
+#define MAX_U16b_VALUE 0x000000000000FFFFUL
+#define MAX_U8b_VALUE  0x00000000000000FFUL
+
+class ExceptionBBInterpretation
+{
+};
+
+
+
 /**
  * @brief Default constructor
  */
 BinBuidler::BinBuidler()
     : m_output(), m_input_available(false),
-      m_output_generated(false), m_output_updated(false)
+      m_output_generated(false), m_output_updated(false),
+      m_verbose(false)
 {
 }
 
@@ -28,7 +40,8 @@ BinBuidler::BinBuidler()
  */
 BinBuidler::BinBuidler(const BinBuidler &b)
     : m_output(), m_input_available(b.m_input_available),
-      m_output_generated(false), m_output_updated(false)
+      m_output_generated(false), m_output_updated(false),
+      m_verbose(false)
 {
     m_input.str(b.m_input.str());
 }
@@ -40,7 +53,8 @@ BinBuidler::BinBuidler(const BinBuidler &b)
  */
 BinBuidler::BinBuidler(std::string& s)
 : m_output(), m_input_available(false),
-  m_output_generated(false), m_output_updated(false)
+  m_output_generated(false), m_output_updated(false),
+  m_verbose(false)
 {
     m_input.str() = s;
 }
@@ -52,7 +66,8 @@ BinBuidler::BinBuidler(std::string& s)
  */
 BinBuidler::BinBuidler(std::stringstream& s)
 : m_output(), m_input_available(false),
-  m_output_generated(false), m_output_updated(false)
+  m_output_generated(false), m_output_updated(false),
+  m_verbose(false)
 {
     m_input.str(s.str());
 }
@@ -93,12 +108,25 @@ void BinBuidler::set_input(const std::string& input)
     m_input_available = true;
 }
 
+void BinBuidler::set_verbosity(bool activation)
+{
+    m_verbose = activation;
+}
+
+/*TODO
 bool BinBuidler::buildbin(const std::stringstream& input)
 {
 }
 
 bool BinBuidler::buildbin(const std::string& input)
 {
+}
+*/
+bool BinBuidler::get_binary(std::vector<char>& output) const
+{
+    bool ret = false;
+    output = m_output;
+    return ret;
 }
 
 void BinBuidler::parse_data(void)
@@ -118,19 +146,19 @@ void BinBuidler::parse_data(void)
 
         if (starts_with(s, "#") || s.size() == 0)
         {
-            std::cout << "<ignore line>"<<std::endl;
+            bb_log("<ignore line>");
         }
 
         // change current endianness
 
         else if(s == "little-endian")
         {
-            std::cout<<"<le mode>"<<std::endl;
+            bb_log("<default endianess little-endian>");
             endianess = little_endian;
         }
         else if(s == "big-endian")
         {
-            std::cout<<"<be mode>"<<std::endl;
+            bb_log("<default endianess big-endian>");
             endianess = big_endian;
         }
 
@@ -138,19 +166,23 @@ void BinBuidler::parse_data(void)
 
         else if ((s == "hexadecimal") || (s == "hexa") || (s == "hex"))
         {
+            bb_log("<default mode hexadecimal>");
             numbers = t_num_hexadecimal;
         }
         else if ((s == "decimal") || (s == "dec"))
         {
+            bb_log("<default mode decimal>");
             numbers = t_num_decimal;
         }
         else if ((s == "octal") || (s == "oct"))
         {
+            bb_log("<default mode octal>");
             numbers = t_num_octal;
         }
-        else if ((s == "boolean") || (s == "bool"))
+        else if ((s == "binary") || (s == "bin"))
         {
-            numbers = t_num_boolean;
+            bb_log("<default mode binary>");
+            numbers = t_num_binary;
         }
 
         // convert the string
@@ -160,7 +192,7 @@ void BinBuidler::parse_data(void)
             // string
             if (starts_with(s, "\"") || starts_with(s, "\'"))
             {
-                std::cout<<"<string>";
+                bb_log("<string>");
                 // remove delimiters
                 s = s.substr(1, s.size() - 2);
                 curr_type = t_string;
@@ -169,6 +201,7 @@ void BinBuidler::parse_data(void)
             // explicit hexa number
             else if (starts_with(s, "0x"))
             {
+                bb_log("<explicit hexa>");
                 s = s.substr(2, s.size() - 2);
                 curr_type = t_num_hexadecimal;
             }
@@ -176,6 +209,7 @@ void BinBuidler::parse_data(void)
             // explicit decimal number
             else if (starts_with(s, "0d"))
             {
+                bb_log("<explicit decimal>");
                 s = s.substr(2, s.size() - 2);
                 curr_type = t_num_decimal;
             }
@@ -183,41 +217,49 @@ void BinBuidler::parse_data(void)
             // explicit octal number
             else if (starts_with(s, "0o"))
             {
+                bb_log("<explicit octal>");
                 s = s.substr(2, s.size() - 2);
                 curr_type = t_num_octal;
             }
 
-            // explicit boolean number
+            // explicit binary number
             else if (starts_with(s, "0b"))
             {
+                bb_log("<explicit binary>");
                 s = s.substr(2, s.size() - 2);
-                curr_type = t_num_boolean;
+                curr_type = t_num_binary;
             }
 
             // number with current type
             else
             {
+                bb_log("<number>");
                 curr_type = numbers;
             }
 
             add_to_bin_output(curr_type, endianess, s);
         }
     }
-    //TODO remove
-    for (int i=0;i<m_output.size();i++)
-    {
-        std::cout << std::hex << (unsigned int)m_output[i] << " ";
-    }
+    std::stringstream ss;
+    ss << "<generated " << m_output.size() << " bytes>";
+    bb_log(ss.str());
 }
 
+/**
+ * @brief Add an element to the binary output
+ * If the element is a number, it will therefore use an output size depending on
+ * its value or for hexa on the string size.
+ *
+ * @param stype the element type (raw string, hexa, decimal,...)
+ * @param etype the endianess of the output
+ * @param s the string representing the element
+ *
+ * @exception ExceptionBBInterpretation unable to interpret the element
+ */
 void BinBuidler::add_to_bin_output(const type_t stype, const endianess_t etype,
         const std::string& s)
 {
     const char *p;
-    std::stringstream ss;
-    uint32_t val_u32;
-    uint16_t val_u16;
-    char val[8];
     uint64_t val_u64;
 
     p = s.c_str();
@@ -228,6 +270,7 @@ void BinBuidler::add_to_bin_output(const type_t stype, const endianess_t etype,
         m_output.insert(m_output.end(), p, p + s.size());
     }
 
+    // number
     else
     {
         int base;
@@ -239,46 +282,70 @@ void BinBuidler::add_to_bin_output(const type_t stype, const endianess_t etype,
         {
             base = 10;
         }
+        else if (stype == t_num_octal)
+        {
+            base = 8;
+        }
+        else if (stype == t_num_binary)
+        {
+            base = 2;
+        }
+        else
+        {
+            throw ExceptionBBInterpretation();
+        }
+
+        // convert from ascii to number
         val_u64 = (uint64_t)std::stoul(s, 0, base);
         p = (char*)&val_u64;
+
         // big-endian
         if (etype == big_endian)
         {
-            if (val_u64 > 0x00000000FFFFFFFFUL)
+            if ((val_u64 > MAX_U32b_VALUE) ||
+                    ((stype == t_num_hexadecimal) && (s.size() > 8)))
             {
                 m_output.push_back(p[7]);
                 m_output.push_back(p[6]);
                 m_output.push_back(p[5]);
                 m_output.push_back(p[4]);
             }
-            if (val_u64 > 0x000000000000FFFFUL)
+            if ((val_u64 > MAX_U16b_VALUE) ||
+                    ((stype == t_num_hexadecimal) && (s.size() > 4)))
             {
                 m_output.push_back(p[3]);
                 m_output.push_back(p[2]);
             }
-            if (val_u64 > 0x00000000000000FFUL)
+            if (val_u64 > MAX_U8b_VALUE)
             {
                 m_output.push_back(p[1]);
+                m_output.push_back(p[0]);
+            }
+            else
+            {
                 m_output.push_back(p[0]);
             }
         }
         // little-endian
         else
         {
-            //if ((s.size() > 2) && (s.size() <= 16))
-            if (val_u64 > 0x00000000000000FFUL)
+            if (val_u64 > MAX_U8b_VALUE)
             {
                 m_output.push_back(p[0]);
                 m_output.push_back(p[1]);
             }
-            //if ((s.size() > 4) && (s.size() <= 16))
-            if (val_u64 > 0x000000000000FFFFUL)
+            else
+            {
+                m_output.push_back(p[0]);
+            }
+            if ((val_u64 > MAX_U16b_VALUE) ||
+                    ((stype == t_num_hexadecimal) && (s.size() > 4)))
             {
                 m_output.push_back(p[2]);
                 m_output.push_back(p[3]);
             }
-            //if ((s.size() > 8) && (s.size() <= 16))
-            if (val_u64 > 0x00000000FFFFFFFFUL)
+            if ((val_u64 > MAX_U32b_VALUE) ||
+                    ((stype == t_num_hexadecimal) && (s.size() > 8)))
             {
                 m_output.push_back(p[4]);
                 m_output.push_back(p[5]);
@@ -286,13 +353,13 @@ void BinBuidler::add_to_bin_output(const type_t stype, const endianess_t etype,
                 m_output.push_back(p[7]);
             }
         }
-        //TODO update size checking for decimal
     }
 }
 
-bool BinBuidler::get_binary(std::vector<char>& output) const
+void BinBuidler::bb_log(std::string msg)
 {
-    bool ret = false;
-    output = m_output;
-    return ret;
+    if (m_verbose)
+    {
+        std::clog << msg << std::endl;
+    }
 }
