@@ -1,0 +1,28 @@
+# an exemple of file description of binary data to generate
+
+# set endianess to big-endian
+big-endian
+
+# default number is hexadecimal
+00112233
+
+# man can explicit a number type 0b means boolean number
+0b0100110111100000
+
+# change endianess to little-endian
+little-endian
+
+# if no explicit, use default
+44556677
+
+# change default to decimal
+decimal
+
+# following number is now decimal
+0123
+
+# strings are delimited by " or '
+"this is some raw string"
+
+# explicit hexa number starts with 0x
+0xff
