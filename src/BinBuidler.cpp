@@ -217,6 +217,8 @@ void BinBuidler::add_to_bin_output(const type_t stype, const endianess_t etype,
     std::stringstream ss;
     uint32_t val_u32;
     uint16_t val_u16;
+    char val[8];
+    uint64_t val_u64;
 
     p = s.c_str();
 
@@ -237,41 +239,54 @@ void BinBuidler::add_to_bin_output(const type_t stype, const endianess_t etype,
         {
             base = 10;
         }
+        val_u64 = (uint64_t)std::stoul(s, 0, base);
+        p = (char*)&val_u64;
+        // big-endian
+        if (etype == big_endian)
+        {
+            if (val_u64 > 0x00000000FFFFFFFFUL)
+            {
+                m_output.push_back(p[7]);
+                m_output.push_back(p[6]);
+                m_output.push_back(p[5]);
+                m_output.push_back(p[4]);
+            }
+            if (val_u64 > 0x000000000000FFFFUL)
+            {
+                m_output.push_back(p[3]);
+                m_output.push_back(p[2]);
+            }
+            if (val_u64 > 0x00000000000000FFUL)
+            {
+                m_output.push_back(p[1]);
+                m_output.push_back(p[0]);
+            }
+        }
+        // little-endian
+        else
+        {
+            //if ((s.size() > 2) && (s.size() <= 16))
+            if (val_u64 > 0x00000000000000FFUL)
+            {
+                m_output.push_back(p[0]);
+                m_output.push_back(p[1]);
+            }
+            //if ((s.size() > 4) && (s.size() <= 16))
+            if (val_u64 > 0x000000000000FFFFUL)
+            {
+                m_output.push_back(p[2]);
+                m_output.push_back(p[3]);
+            }
+            //if ((s.size() > 8) && (s.size() <= 16))
+            if (val_u64 > 0x00000000FFFFFFFFUL)
+            {
+                m_output.push_back(p[4]);
+                m_output.push_back(p[5]);
+                m_output.push_back(p[6]);
+                m_output.push_back(p[7]);
+            }
+        }
         //TODO update size checking for decimal
-        if (s.size() == 4)
-        {
-            val_u16 = (uint16_t)std::stoul(s, 0, base);
-            p = (char*)&val_u16;
-            if (etype == big_endian)
-            {
-                m_output.push_back(p[1]);
-                m_output.push_back(p[0]);
-            }
-            else
-            {
-                m_output.push_back(p[0]);
-                m_output.push_back(p[1]);
-            }
-        }
-        else if (s.size() == 8)
-        {
-            val_u32 = (uint32_t)std::stoul(s, 0, base);
-            p = (char*)&val_u32;
-            if (etype == big_endian)
-            {
-                m_output.push_back(p[3]);
-                m_output.push_back(p[2]);
-                m_output.push_back(p[1]);
-                m_output.push_back(p[0]);
-            }
-            else
-            {
-                m_output.push_back(p[0]);
-                m_output.push_back(p[1]);
-                m_output.push_back(p[2]);
-                m_output.push_back(p[3]);
-            }
-        }
     }
 }
 
