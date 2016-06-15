@@ -10,7 +10,7 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
-#include "BinBuidler.h"
+#include "BinBuilder.h"
 
 using namespace std;
 

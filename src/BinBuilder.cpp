@@ -12,7 +12,7 @@
 
 #include "utils.h"
 
-#include "BinBuidler.h"
+#include "BinBuilder.h"
 
 
 #define MAX_U32b_VALUE 0x00000000FFFFFFFFUL
