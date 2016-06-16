@@ -21,42 +21,46 @@ You should build the binary and then use it.
 
 - Input file `exemple.txt`:
 
-    # an exemple of file description of binary data to generate
+```
+# an exemple of file description of binary data to generate
 
-    # set endianess to big-endian
-    big-endian
+# set endianess to big-endian
+big-endian
 
-    # default number is hexadecimal
-    00112233
+# default number is hexadecimal
+00112233
 
-    # man can explicit a number type 0b means boolean number
-    0b0100110111100000
+# man can explicit a number type 0b means boolean number
+0b0100110111100000
 
-    # change endianess to little-endian
-    little-endian
+# change endianess to little-endian
+little-endian
 
-    # if no explicit, use default
-    44556677
+# if no explicit, use default
+44556677
 
-    # change default to decimal
-    decimal
+# change default to decimal
+decimal
 
-    # following number is now decimal
-    0123
+# following number is now decimal
+0123
 
-    # strings are delimited by " or '
-    "this is some raw string"
+# strings are delimited by " or '
+"this is some raw string"
 
-    # explicit hexa number starts with 0x
-    0xff
+# explicit hexa number starts with 0x
+0xff
+```
 
-    - Output file`exemple.bin`:
+- Output file`exemple.bin`:
 
-    $ hexdump -C exemple.bin
-    00000000  00 11 22 33 4d e0 77 66  55 44 7b 74 68 69 73 20  |.."3M.wfUD{this |
-    00000010  69 73 20 73 6f 6d 65 20  72 61 77 20 73 74 72 69  |is some raw stri|
-    00000020  6e 67 ff                                          |ng.|
-    00000023
+```
+$ hexdump -C exemple.bin
+00000000  00 11 22 33 4d e0 77 66  55 44 7b 74 68 69 73 20  |.."3M.wfUD{this |
+00000010  69 73 20 73 6f 6d 65 20  72 61 77 20 73 74 72 69  |is some raw stri|
+00000020  6e 67 ff                                          |ng.|
+00000023
+```
 
 ## Brief documentation
 
