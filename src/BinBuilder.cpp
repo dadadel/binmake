@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -86,14 +87,13 @@ BinBuidler::~BinBuidler()
  */
 bool BinBuidler::buildbin(void)
 {
-    bool ret = false;
     if (m_input_available)
     {
         m_output.clear();
         parse_data();
-        ret = true;
+        m_output_generated = true;
     }
-    return ret;
+    return m_output_generated;
 }
 
 void BinBuidler::set_input(const std::stringstream& input)
@@ -122,11 +122,22 @@ bool BinBuidler::buildbin(const std::string& input)
 {
 }
 */
-bool BinBuidler::get_binary(std::vector<char>& output) const
+
+/**
+ * @brief Get the binary generated output.
+ *
+ * @param output will contain the output binary data
+ *
+ * @return true if the output was generated else false
+ */
+bool BinBuidler::get_binary(std::vector<char>& output)
 {
-    bool ret = false;
+    if (!m_output_generated)
+    {
+        buildbin();
+    }
     output = m_output;
-    return ret;
+    return m_output_generated;
 }
 
 void BinBuidler::parse_data(void)
@@ -196,48 +207,57 @@ void BinBuidler::parse_data(void)
                 // remove delimiters
                 s = s.substr(1, s.size() - 2);
                 curr_type = t_string;
+                add_to_bin_output(curr_type, endianess, s);
             }
 
-            // explicit hexa number
-            else if (starts_with(s, "0x"))
-            {
-                bb_log("<explicit hexa>");
-                s = s.substr(2, s.size() - 2);
-                curr_type = t_num_hexadecimal;
-            }
-
-            // explicit decimal number
-            else if (starts_with(s, "0d"))
-            {
-                bb_log("<explicit decimal>");
-                s = s.substr(2, s.size() - 2);
-                curr_type = t_num_decimal;
-            }
-
-            // explicit octal number
-            else if (starts_with(s, "0o"))
-            {
-                bb_log("<explicit octal>");
-                s = s.substr(2, s.size() - 2);
-                curr_type = t_num_octal;
-            }
-
-            // explicit binary number
-            else if (starts_with(s, "0b"))
-            {
-                bb_log("<explicit binary>");
-                s = s.substr(2, s.size() - 2);
-                curr_type = t_num_binary;
-            }
-
-            // number with current type
+            // number(s)
             else
             {
-                bb_log("<number>");
-                curr_type = numbers;
-            }
+                std::istringstream ss(s);
+                std::string w;
+                while(ss >> w)
+                {
+                    // explicit hexa number
+                    if (starts_with(w, "0x"))
+                    {
+                        bb_log("<explicit hexa>");
+                        w = w.substr(2, w.size() - 2);
+                        curr_type = t_num_hexadecimal;
+                    }
 
-            add_to_bin_output(curr_type, endianess, s);
+                    // explicit decimal number
+                    else if (starts_with(w, "0d"))
+                    {
+                        bb_log("<explicit decimal>");
+                        w = w.substr(2, w.size() - 2);
+                        curr_type = t_num_decimal;
+                    }
+
+                    // explicit octal number
+                    else if (starts_with(w, "0o"))
+                    {
+                        bb_log("<explicit octal>");
+                        w = w.substr(2, w.size() - 2);
+                        curr_type = t_num_octal;
+                    }
+
+                    // explicit binary number
+                    else if (starts_with(s, "0b"))
+                    {
+                        bb_log("<explicit binary>");
+                        w = w.substr(2, w.size() - 2);
+                        curr_type = t_num_binary;
+                    }
+
+                    // number with current type
+                    else
+                    {
+                        bb_log("<number>");
+                        curr_type = numbers;
+                    }
+                    add_to_bin_output(curr_type, endianess, w);
+                }
+            }
         }
     }
     std::stringstream ss;

@@ -55,7 +55,7 @@ public:
     /*bool buildbin(const std::stringstream &input);
     bool buildbin(const std::string &input);*/
     bool buildbin(void);
-    bool get_binary(std::vector<char> &output) const;
+    bool get_binary(std::vector<char> &output);
 };
 
 #endif /* BINBUIDLER_H_ */

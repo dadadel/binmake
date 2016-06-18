@@ -30,7 +30,7 @@ big-endian
 # default number is hexadecimal
 00112233
 
-# man can explicit a number type 0b means boolean number
+# man can explicit a number type 0b means binary number
 0b0100110111100000
 
 # change endianess to little-endian
@@ -38,6 +38,9 @@ little-endian
 
 # if no explicit, use default
 44556677
+
+# bytes are not concerned by endianess
+88 99 aa bb
 
 # change default to decimal
 decimal
@@ -55,11 +58,10 @@ decimal
 - Output file`exemple.bin`:
 
 ```
-$ hexdump -C exemple.bin
-00000000  00 11 22 33 4d e0 77 66  55 44 7b 74 68 69 73 20  |.."3M.wfUD{this |
-00000010  69 73 20 73 6f 6d 65 20  72 61 77 20 73 74 72 69  |is some raw stri|
-00000020  6e 67 ff                                          |ng.|
-00000023
+00000000  00 11 22 33 4d e0 77 66  55 44 88 99 aa bb 7b 74  |.."3M.wfUD....{t|
+00000010  68 69 73 20 69 73 20 73  6f 6d 65 20 72 61 77 20  |his is some raw |
+00000020  73 74 72 69 6e 67 ff                              |string.|
+00000027
 ```
 
 ## Brief documentation

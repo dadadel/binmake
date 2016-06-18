@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 {
     BinBuidler b;
     vector<char> bin;
-    b.set_verbosity(true);
+    //b.set_verbosity(true);
     //TODO :
     // if an argument (not option) set input file instead of stdin
     // if option -o set output file instead of stdout

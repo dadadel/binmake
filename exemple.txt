@@ -6,7 +6,7 @@ big-endian
 # default number is hexadecimal
 00112233
 
-# man can explicit a number type 0b means boolean number
+# man can explicit a number type 0b means binary number
 0b0100110111100000
 
 # change endianess to little-endian
@@ -14,6 +14,9 @@ little-endian
 
 # if no explicit, use default
 44556677
+
+# bytes are not concerned by endianess
+88 99 aa bb
 
 # change default to decimal
 decimal

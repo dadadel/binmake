@@ -19,5 +19,4 @@ std::string& strip(std::string& s);
 bool endswith(const std::string &str, const std::string &suffix);
 
 
-
 #endif /* UTILS_H_ */
