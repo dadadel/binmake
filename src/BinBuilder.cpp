@@ -226,7 +226,7 @@ void BinBuidler::parse_data(void)
                     }
 
                     // explicit decimal number
-                    else if (starts_with(w, "0d"))
+                    else if (starts_with(w, "0i"))
                     {
                         bb_log("<explicit decimal>");
                         w = w.substr(2, w.size() - 2);
@@ -242,7 +242,7 @@ void BinBuidler::parse_data(void)
                     }
 
                     // explicit binary number
-                    else if (starts_with(s, "0b"))
+                    else if (starts_with(s, "0y"))
                     {
                         bb_log("<explicit binary>");
                         w = w.substr(2, w.size() - 2);

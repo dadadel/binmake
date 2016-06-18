@@ -7,7 +7,7 @@ big-endian
 00112233
 
 # man can explicit a number type 0b means binary number
-0b0100110111100000
+0y0100110111100000
 
 # change endianess to little-endian
 little-endian
