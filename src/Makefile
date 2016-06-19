@@ -6,7 +6,7 @@ TARGET = $(BIN_PATH)/binmake
 OBJECTS = $(SOURCES:.cpp=.o)
 
 CXX=g++
-CFLAGS = -std=c++11 -Wall -Wextra
+CFLAGS = -std=c++11 -Wall -Wextra -I.
 LDFLAGS =
 
 all: $(SOURCES) $(TARGET)
