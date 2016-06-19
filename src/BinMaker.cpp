@@ -1,5 +1,5 @@
 /*
- * BinBuidler.cpp
+ * BinMaker.cpp
  *
  *  Created on: 14 juin 2016
  *      Author: adaouzli
@@ -13,7 +13,7 @@
 
 #include "utils.h"
 
-#include "BinBuilder.h"
+#include "BinMaker.h"
 
 
 #define MAX_U32b_VALUE 0x00000000FFFFFFFFUL
@@ -29,7 +29,7 @@ class ExceptionBBInterpretation
 /**
  * @brief Default constructor
  */
-BinBuidler::BinBuidler()
+BinMaker::BinMaker()
     : m_output(), m_input_available(false),
       m_output_generated(false), m_output_updated(false),
       m_verbose(false)
@@ -39,7 +39,7 @@ BinBuidler::BinBuidler()
 /**
  * @brief Copy constructor
  */
-BinBuidler::BinBuidler(const BinBuidler &b)
+BinMaker::BinMaker(const BinMaker &b)
     : m_output(), m_input_available(b.m_input_available),
       m_output_generated(false), m_output_updated(false),
       m_verbose(false)
@@ -52,7 +52,7 @@ BinBuidler::BinBuidler(const BinBuidler &b)
  *
  * @param s the string to set as input text
  */
-BinBuidler::BinBuidler(std::string& s)
+BinMaker::BinMaker(std::string& s)
 : m_output(), m_input_available(false),
   m_output_generated(false), m_output_updated(false),
   m_verbose(false)
@@ -65,7 +65,7 @@ BinBuidler::BinBuidler(std::string& s)
  *
  * @param s the string stream to set as input text
  */
-BinBuidler::BinBuidler(std::stringstream& s)
+BinMaker::BinMaker(std::stringstream& s)
 : m_output(), m_input_available(false),
   m_output_generated(false), m_output_updated(false),
   m_verbose(false)
@@ -76,7 +76,7 @@ BinBuidler::BinBuidler(std::stringstream& s)
 /**
  * @brief Destructor
  */
-BinBuidler::~BinBuidler()
+BinMaker::~BinMaker()
 {
 }
 
@@ -85,7 +85,7 @@ BinBuidler::~BinBuidler()
  *
  * @return true if built the binary else false
  */
-bool BinBuidler::buildbin(void)
+bool BinMaker::buildbin(void)
 {
     if (m_input_available)
     {
@@ -96,29 +96,29 @@ bool BinBuidler::buildbin(void)
     return m_output_generated;
 }
 
-void BinBuidler::set_input(const std::stringstream& input)
+void BinMaker::set_input(const std::stringstream& input)
 {
     m_input.str(input.str());
     m_input_available = true;
 }
 
-void BinBuidler::set_input(const std::string& input)
+void BinMaker::set_input(const std::string& input)
 {
     m_input.str(input);
     m_input_available = true;
 }
 
-void BinBuidler::set_verbosity(bool activation)
+void BinMaker::set_verbosity(bool activation)
 {
     m_verbose = activation;
 }
 
 /*TODO
-bool BinBuidler::buildbin(const std::stringstream& input)
+bool BinMaker::buildbin(const std::stringstream& input)
 {
 }
 
-bool BinBuidler::buildbin(const std::string& input)
+bool BinMaker::buildbin(const std::string& input)
 {
 }
 */
@@ -130,7 +130,7 @@ bool BinBuidler::buildbin(const std::string& input)
  *
  * @return true if the output was generated else false
  */
-bool BinBuidler::get_binary(std::vector<char>& output)
+bool BinMaker::get_binary(std::vector<char>& output)
 {
     if (!m_output_generated)
     {
@@ -140,7 +140,7 @@ bool BinBuidler::get_binary(std::vector<char>& output)
     return m_output_generated;
 }
 
-void BinBuidler::parse_data(void)
+void BinMaker::parse_data(void)
 {
     std::string s;
 
@@ -276,7 +276,7 @@ void BinBuidler::parse_data(void)
  *
  * @exception ExceptionBBInterpretation unable to interpret the element
  */
-void BinBuidler::add_to_bin_output(const type_t stype, const endianess_t etype,
+void BinMaker::add_to_bin_output(const type_t stype, const endianess_t etype,
         const std::string& s)
 {
     const char *p;
@@ -376,7 +376,7 @@ void BinBuidler::add_to_bin_output(const type_t stype, const endianess_t etype,
     }
 }
 
-void BinBuidler::bb_log(std::string msg)
+void BinMaker::bb_log(std::string msg)
 {
     if (m_verbose)
     {

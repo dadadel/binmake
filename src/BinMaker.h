@@ -6,8 +6,8 @@
 // Description : Built binary file header
 //============================================================================
 
-#ifndef BINBUIDLER_H_
-#define BINBUIDLER_H_
+#ifndef BinMaker_H_
+#define BinMaker_H_
 
 #include <sstream>
 #include <string>
@@ -29,7 +29,7 @@ typedef enum
     big_endian
 } endianess_t;
 
-class BinBuidler
+class BinMaker
 {
 private:
     std::stringstream m_input; // the input string to convert to binary
@@ -44,11 +44,11 @@ private:
     void bb_log(std::string msg);
 
 public:
-    BinBuidler();
-    BinBuidler(const BinBuidler &b);
-    BinBuidler(std::string &s);
-    BinBuidler(std::stringstream &s);
-    virtual ~BinBuidler();
+    BinMaker();
+    BinMaker(const BinMaker &b);
+    BinMaker(std::string &s);
+    BinMaker(std::stringstream &s);
+    virtual ~BinMaker();
     void set_verbosity(bool activation);
     void set_input(const std::stringstream &input);
     void set_input(const std::string &input);
@@ -58,4 +58,4 @@ public:
     bool get_binary(std::vector<char> &output);
 };
 
-#endif /* BINBUIDLER_H_ */
+#endif /* BinMaker_H_ */

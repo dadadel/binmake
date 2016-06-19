@@ -10,13 +10,13 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
-#include "BinBuilder.h"
+#include "BinMaker.h"
 
 using namespace std;
 
 int main(int argc, char** argv)
 {
-    BinBuidler b;
+    BinMaker b;
     vector<char> bin;
     //b.set_verbosity(true);
     //TODO :

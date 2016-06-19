@@ -1,5 +1,5 @@
 BIN_PATH=..
-SOURCES = BinBuilder.cpp \
+SOURCES = BinMaker.cpp \
           binmake.cpp \
           utils.cpp
 TARGET = $(BIN_PATH)/binmake
