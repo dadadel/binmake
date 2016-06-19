@@ -8,7 +8,7 @@ TARGET = $(BIN_PATH)/test_binmake
 OBJECTS=$(notdir $(SOURCES:.cpp=.o))
 
 CXX=g++
-CFLAGS = -std=c++11 -Wall -Wextra -I$(INC_PATH)
+CFLAGS = -std=c++11 -Wall -Wextra -I$(INC_PATH) -I.
 LDFLAGS =
 
 all: $(SOURCES) $(TARGET)
