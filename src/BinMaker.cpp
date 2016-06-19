@@ -85,7 +85,7 @@ BinMaker::~BinMaker()
  *
  * @return true if built the binary else false
  */
-bool BinMaker::buildbin(void)
+bool BinMaker::make_binary(void)
 {
     if (m_input_available)
     {
@@ -114,11 +114,11 @@ void BinMaker::set_verbosity(bool activation)
 }
 
 /*TODO
-bool BinMaker::buildbin(const std::stringstream& input)
+bool BinMaker::make_binary(const std::stringstream& input)
 {
 }
 
-bool BinMaker::buildbin(const std::string& input)
+bool BinMaker::make_binary(const std::string& input)
 {
 }
 */
@@ -134,7 +134,7 @@ bool BinMaker::get_binary(std::vector<char>& output)
 {
     if (!m_output_generated)
     {
-        buildbin();
+        make_binary();
     }
     output = m_output;
     return m_output_generated;

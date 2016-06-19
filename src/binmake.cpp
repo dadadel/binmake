@@ -32,7 +32,7 @@ int main(int argc, char** argv)
         {
             ss << f.rdbuf();
             b.set_input(ss);
-            b.buildbin();
+            b.make_binary();
             b.get_binary(bin);
             t.write(bin.data(), bin.size());
             t.close();

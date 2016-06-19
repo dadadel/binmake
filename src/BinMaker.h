@@ -52,9 +52,9 @@ public:
     void set_verbosity(bool activation);
     void set_input(const std::stringstream &input);
     void set_input(const std::string &input);
-    /*bool buildbin(const std::stringstream &input);
-    bool buildbin(const std::string &input);*/
-    bool buildbin(void);
+    /*bool make_binary(const std::stringstream &input);
+    bool make_binary(const std::string &input);*/
+    bool make_binary(void);
     bool get_binary(std::vector<char> &output);
 };
 
