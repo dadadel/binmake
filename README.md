@@ -1,6 +1,6 @@
 # binmake
 
-This is a tool for generating a binary file described by a human readable text file.
+This is an open source tool for generating a binary file described by a human readable text file.
 It manage endianess, several numbers representations, raw strings.
 It ignores comments lines, empty lines, leading and ending spaces.
 
@@ -78,15 +78,16 @@ A string should start and end by either `"` (double quotes) or `'`
 
 ### Numbers
 
-There is several way to represent numbers. By default a number is expected to
+It is possible to set on the same line several numbers separated by spaces.
+There is several way to represent a number. By default a number is expected to
 be in hexadecimal representation unless the default representation is changed.
 
 To force interpretation of a number representation, it should start with one of
-the following suffixes :
-- `0x` represents hexadecimal number [0-9a-fA-F]
-- `0i` represents decimal number [0-9]
-- `0o` represents octal number [0-7]
-- `0y` represents binary number [0-1]
+the following prefix:
+- `0x` represents hexadecimal number (digits in [0-9a-fA-F])
+- `0i` represents decimal number (digits in [[0-9])
+- `0o` represents octal number (digits in [[0-7])
+- `0y` represents binary number (digits in [[0-1])
 
 A number will be then represented as a 8 bits, 16 bits, 32 bits or 64 bits
 number in the binary output depending on the value of the number. If exceeding
@@ -106,7 +107,7 @@ Some special keywords can be used to change default endianess output usage or
 input not explicit number interpretation.
 
 Note that a keyword should be on a single line without any character other than
-a space character.
+space characters.
 
 - `little-endian`, `big-endian`
 

@@ -2,8 +2,8 @@
 // Name        : builtbin.h
 // Author      : Adel Daouzli
 // Version     :
-// Copyright   : GPL3
-// Description : Built binary file header
+// Copyright   : MIT License
+// Description : Make binary file header
 //============================================================================
 
 #ifndef BinMaker_H_

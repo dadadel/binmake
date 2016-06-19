@@ -2,7 +2,7 @@
 // Name        : util.cpp
 // Author      : Adel Daouzli
 // Version     :
-// Copyright   : GPL3
+// Copyright   : MIT License
 // Description : Useful functions
 //============================================================================
 

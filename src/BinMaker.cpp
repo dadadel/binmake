@@ -1,9 +1,10 @@
-/*
- * BinMaker.cpp
- *
- *  Created on: 14 juin 2016
- *      Author: adaouzli
- */
+//============================================================================
+// Name        : builtbin.h
+// Author      : Adel Daouzli
+// Version     :
+// Copyright   : MIT License
+// Description : Make binary file header
+//============================================================================
 
 #include <stdint.h>
 #include <iostream>

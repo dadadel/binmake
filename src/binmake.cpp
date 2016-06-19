@@ -2,8 +2,8 @@
 // Name        : builtbin.cpp
 // Author      : Adel Daouzli
 // Version     :
-// Copyright   : GPL3
-// Description : Built binary file
+// Copyright   : MIT License
+// Description : Make binary file
 //============================================================================
 
 #include <iostream>
