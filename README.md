@@ -15,9 +15,11 @@ You should build the binary and then use it.
 
 ## How to use
 
-    $ ./makebin exemple.txt -o exemple.bin
-    # or equivalent using stdin/stdout
-    $ cat exemple.txt | ./makebin > exemple.bin #TODO!!!
+    $ ./makebin exemple.txt exemple.bin
+    # or output to stdout
+    $ ./makebin exemple.txt > exemple.bin
+    # or input/output from/to stdin/stdout
+    $ cat exemple.txt | ./makebin > exemple.bin
 
 - Input file `exemple.txt`:
 
