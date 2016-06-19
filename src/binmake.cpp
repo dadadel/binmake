@@ -14,6 +14,12 @@
 
 using namespace std;
 
+void usage(std::string name)
+{
+    cerr << "Usage: " << name << " input_text_file [output_binary_file]" <<
+            endl;
+}
+
 int main(int argc, char** argv)
 {
     BinMaker b;
@@ -40,9 +46,8 @@ int main(int argc, char** argv)
     }
     else
     {
-        cerr << "Bad number of arguments" << endl <<
-                "Syntax: " << argv[0] <<
-                " input_text_file [output_binary_file]" << endl;
+        cerr << "Bad number of arguments" << endl;
+        usage(argv[0]);
     }
 
     return 0;
