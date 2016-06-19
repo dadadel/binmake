@@ -1,7 +1,7 @@
-all: binmake
+SRC_PATH=./src
 
-binmake:
-	g++ -std=c++11 src/BinBuilder.cpp src/binmake.cpp src/utils.cpp -o binmake -Wall
+all:
+	make -C $(SRC_PATH)
 
 clean:
-	rm -rf *.o binmake
+	make -C $(SRC_PATH) clean
