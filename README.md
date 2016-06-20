@@ -32,7 +32,7 @@ big-endian
 # default number is hexadecimal
 00112233
 
-# man can explicit a number type 0b means binary number
+# man can explicit a number type: 0y means binary number
 0y0100110111100000
 
 # change endianess to little-endian
@@ -87,9 +87,9 @@ be in hexadecimal representation unless the default representation is changed.
 To force interpretation of a number representation, it should start with one of
 the following prefix:
 - `0x` represents hexadecimal number (digits in [0-9a-fA-F])
-- `0i` represents decimal number (digits in [[0-9])
-- `0o` represents octal number (digits in [[0-7])
-- `0y` represents binary number (digits in [[0-1])
+- `0i` represents decimal number (digits in [0-9])
+- `0o` represents octal number (digits in [0-7])
+- `0y` represents binary number (digits in [0-1])
 
 A number will be then represented as a 8 bits, 16 bits, 32 bits or 64 bits
 number in the binary output depending on the value of the number. If exceeding
