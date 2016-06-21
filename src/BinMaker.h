@@ -54,6 +54,7 @@ public:
     void set_input(const std::string &input);
     /*bool make_binary(const std::stringstream &input);
     bool make_binary(const std::string &input);*/
+    void reset_output(void);
     bool make_binary(void);
     bool get_binary(std::vector<char> &output);
 };

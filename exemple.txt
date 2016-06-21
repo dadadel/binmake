@@ -6,8 +6,8 @@ big-endian
 # default number is hexadecimal
 00112233
 
-# man can explicit a number type: 0y means binary number
-0y0100110111100000
+# man can explicit a number type: prefix %b means binary number
+%b0100110111100000
 
 # change endianess to little-endian
 little-endian
@@ -27,5 +27,5 @@ decimal
 # strings are delimited by " or '
 "this is some raw string"
 
-# explicit hexa number starts with 0x
-0xff
+# explicit hexa number starts with %x
+%xff

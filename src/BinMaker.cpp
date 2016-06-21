@@ -16,6 +16,10 @@
 
 #include "BinMaker.h"
 
+#define PREFIX_NUMBER_DECIMAL "%d"
+#define PREFIX_NUMBER_HEXADECIMAL "%x"
+#define PREFIX_NUMBER_BINARY "%b"
+#define PREFIX_NUMBER_OCTAL "%o"
 
 #define MAX_U32b_VALUE 0x00000000FFFFFFFFUL
 #define MAX_U16b_VALUE 0x000000000000FFFFUL
@@ -112,6 +116,15 @@ void BinMaker::set_input(const std::string& input)
 void BinMaker::set_verbosity(bool activation)
 {
     m_verbose = activation;
+}
+
+/**
+ * @brief Reset the output content
+ */
+void BinMaker::reset_output(void)
+{
+    m_output_generated = false;
+    m_output.clear();
 }
 
 /*TODO
@@ -219,7 +232,7 @@ void BinMaker::parse_data(void)
                 while(ss >> w)
                 {
                     // explicit hexa number
-                    if (starts_with(w, "0x"))
+                    if (starts_with(w, PREFIX_NUMBER_HEXADECIMAL))
                     {
                         bb_log("<explicit hexa>");
                         w = w.substr(2, w.size() - 2);
@@ -227,7 +240,7 @@ void BinMaker::parse_data(void)
                     }
 
                     // explicit decimal number
-                    else if (starts_with(w, "0i"))
+                    else if (starts_with(w, PREFIX_NUMBER_DECIMAL))
                     {
                         bb_log("<explicit decimal>");
                         w = w.substr(2, w.size() - 2);
@@ -235,7 +248,7 @@ void BinMaker::parse_data(void)
                     }
 
                     // explicit octal number
-                    else if (starts_with(w, "0o"))
+                    else if (starts_with(w, PREFIX_NUMBER_OCTAL))
                     {
                         bb_log("<explicit octal>");
                         w = w.substr(2, w.size() - 2);
@@ -243,7 +256,7 @@ void BinMaker::parse_data(void)
                     }
 
                     // explicit binary number
-                    else if (starts_with(s, "0y"))
+                    else if (starts_with(s, PREFIX_NUMBER_BINARY))
                     {
                         bb_log("<explicit binary>");
                         w = w.substr(2, w.size() - 2);

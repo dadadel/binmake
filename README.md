@@ -32,8 +32,8 @@ big-endian
 # default number is hexadecimal
 00112233
 
-# man can explicit a number type: 0y means binary number
-0y0100110111100000
+# man can explicit a number type: %b means binary number
+%b0100110111100000
 
 # change endianess to little-endian
 little-endian
@@ -53,8 +53,8 @@ decimal
 # strings are delimited by " or '
 "this is some raw string"
 
-# explicit hexa number starts with 0x
-0xff
+# explicit hexa number starts with %x
+%xff
 ```
 
 - Output file`exemple.bin`:
@@ -86,10 +86,10 @@ be in hexadecimal representation unless the default representation is changed.
 
 To force interpretation of a number representation, it should start with one of
 the following prefix:
-- `0x` represents hexadecimal number (digits in [0-9a-fA-F])
-- `0i` represents decimal number (digits in [0-9])
-- `0o` represents octal number (digits in [0-7])
-- `0y` represents binary number (digits in [0-1])
+- `%x` represents hexadecimal number (digits in [0-9a-fA-F])
+- `%d` represents decimal number (digits in [0-9])
+- `%o` represents octal number (digits in [0-7])
+- `%b` represents binary number (digits in [0-1])
 
 A number will be then represented as a 8 bits, 16 bits, 32 bits or 64 bits
 number in the binary output depending on the value of the number. If exceeding
@@ -97,7 +97,7 @@ one of the above bits size it will use the next available size (max 64 bits).
 
 As exception, if a hexadecimal number is provided with non-significant zeros,
 the size of the string representation will determine the output binary number
-size. Thus, "0x0000" (or "0000" if default is hexa) will generate a 16 bits
+size. Thus, "%x0000" (or "0000" if default is hexa) will generate a 16 bits
 number instead of 8 bits.
 
 For the numbers represented on 16, 32 and 64 bits, the default endianess is
@@ -119,7 +119,7 @@ little-endian. The default endianess can be changed by using the keyword
 Once the default is changed, all further numbers will be represented in the
 new default endianess.
 
-As a reminder, big-endian representation of `0x00112233` is in
+As a reminder, big-endian representation of `%x00112233` is in
 memory `00 11 22 33`, that is the less significant byte in the lower memory
 address.
 Conversly, in little-endian, the number will be represented like `33 22 11 00`,

@@ -47,4 +47,25 @@ TEST_CASE( "Check succeed to make binary", "[binmake]" )
         REQUIRE( output[6] == 0x05 );
         REQUIRE( output[7] == 0x04 );
     }
+
+    SECTION( "- make a binary from an explicit hexadecimal number" )
+    {
+        ss.str("");
+        ss.clear();
+        ss << "big-endian" << std::endl <<
+                "%x12345678" << std::endl <<
+                "%x2f %x00" << std::endl;
+        b.set_input(ss);
+        b.reset_output();
+        REQUIRE( b.make_binary() == true );
+        REQUIRE( b.get_binary(output) == true );
+        REQUIRE( output.size() == 6);
+        REQUIRE( output[0] == 0x12 );
+        REQUIRE( output[1] == 0x34 );
+        REQUIRE( output[2] == 0x56 );
+        REQUIRE( output[3] == 0x78 );
+        REQUIRE( output[4] == 0x2f );
+        REQUIRE( output[5] == 0x00 );
+    }
+    //TODO test hex zero padded size
 }
