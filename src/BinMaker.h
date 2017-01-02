@@ -1,5 +1,5 @@
 //============================================================================
-// Name        : builtbin.h
+// Name        : BinMaker.h
 // Author      : Adel Daouzli
 // Version     :
 // Copyright   : MIT License
