@@ -9,17 +9,24 @@ It ignores comments lines, empty lines, leading and ending spaces.
 `binmake` is a standalone binary written in C++ with C++11 standard.
 You should build the binary and then use it.
 
+You can also compile the module as static or dynamic library to use the streaming
+class BS::BinStream in your own code.
+
     $ make
-    # or
-    $ g++ -std=c++11 binmake.cpp BinBuilder.cpp utils.cpp -o binmake
 
 ## How to use
 
-    $ ./makebin exemple.txt exemple.bin
+### using the binary
+
+    $ ./binmake exemple.txt exemple.bin
     # or output to stdout
     $ ./makebin exemple.txt > exemple.bin
     # or input/output from/to stdin/stdout
     $ cat exemple.txt | ./makebin > exemple.bin
+
+    # example with some ASCII:
+    $ echo '32 decimal 32 61' | ./binmake
+    2 a
 
 - Input file `exemple.txt`:
 
@@ -66,7 +73,106 @@ decimal
 00000027
 ```
 
-## Brief documentation
+# How to include in your code
+
+The header to include is `BinStream.h`.
+The class to use is `BS::BinStream`. To make it easy you can declare the
+namespace `BS`.
+
+You can stream the text description of you binary from: `istream`, `ifstream`,
+`string` and `stringstream`.
+
+You can stream the output binary to: `vector<char>` and `ofstream`.
+
+There follow some examples.
+
+- Create a binary file from strings
+
+```c++
+#include <fstream>
+#include "BinStream.h"
+
+using namespace std;
+using namespace BS;
+
+int main()
+{
+    BinStream bin;
+    bin << "'hello world!'"
+            << "00112233"
+            << "big-endian"
+            << "00112233";
+    ofstream f("test.bin");
+    bin >> f;
+    return 0;
+}
+```
+
+- Create a binary file from a text file
+
+```c++
+#include <fstream>
+#include "BinStream.h"
+
+using namespace std;
+using namespace BS;
+
+int main()
+{
+    BinStream bin;
+    ifstream inf("example.txt");
+    ofstream ouf("example.bin");
+    bin << inf >> ouf;
+    return 0;
+}
+```
+
+- Read from stdin and write to stdout
+
+```c++
+#include <iostream>
+#include "BinStream.h"
+
+using namespace std;
+using namespace BS;
+
+int main()
+{
+    BinStream bin;
+    bin << cin;
+    for (size_t i = 0; i < bin.size(); ++i)
+    {
+        cout << bin[i];
+    }
+    cout.flush();
+    return 0;
+}
+```
+
+- Get the output in a vector
+
+```c++
+#include <iostream>
+#include "BinStream.h"
+
+using namespace std;
+using namespace BS;
+
+int main()
+{
+    BinStream bin;
+    vector<char> output;
+    bin << "'hello world!'" << "00112233";
+    bin >> output;
+    for (size_t i = 0; i < output.size(); ++i)
+    {
+        cout << output.data()[i];
+    }
+    return 0;
+}
+```
+
+## Brief formating documentation
 
 ### Comments
 
