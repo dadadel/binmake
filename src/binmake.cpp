@@ -10,9 +10,11 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
-#include "BinMaker.h"
+
+#include "BinStream.h"
 
 using namespace std;
+using namespace BS;
 
 void usage(std::string name)
 {
@@ -22,55 +24,58 @@ void usage(std::string name)
 
 int main(int argc, char** argv)
 {
-    BinMaker b;
-    vector<char> bin;
-    stringstream ss;
-    //b.set_verbosity(true);
-    //TODO :
-    // if an argument (not option) set input file instead of stdin
-    // if option -o set output file instead of stdout
-    // if option -v set verbose mode
-    if ((argc > 1) && (argc <= 3))
+    BinStream b;
+    int argoffs = 0;
+
+    for (int i = 1; i < argc; ++i)
     {
-        // read input data from file
-        ifstream f(argv[1]);
-        if (f.is_open())
+        if (argv[i][0] == '-')
         {
-            ss << f.rdbuf();
-            b.set_input(ss);
-            b.make_binary();
-            b.get_binary(bin);
-            if (argc == 3)
+            argoffs++;
+            if (argv[i][1] == 'v')
             {
-                // write output data to file
-                ofstream t(argv[2]);
-                t.write(bin.data(), bin.size());
-                t.close();
+                b.set_verbosity(true);
             }
             else
             {
-                // write output data to stdout
-                for (size_t i = 0; i < bin.size(); ++i)
-                {
-                    std::cout << bin.data()[i];
-                }
-                std::cout.flush();
+                cerr << "WARNING: Unexpected option '" << argv[i] << "'" << endl;
             }
+        }
+    }
+    argc -= argoffs;
+
+    if ((argc > 1) && (argc <= 3))
+    {
+        // read input data from file
+        ifstream f(argv[argoffs + 1]);
+        b << f;
+        if (argc == 3)
+        {
+            // write output data to file
+            ofstream t(argv[argoffs + 2]);
+            b >> t;
+            t.close();
+        }
+        else
+        {
+            // write output data to stdout
+            for (size_t i = 0; i < b.size(); ++i)
+            {
+                cout << b[i];
+            }
+            cout.flush();
         }
     }
     else if(argc == 1)
     {
         // read input data from stdin
-        ss << cin.rdbuf();
-        b.set_input(ss);
-        b.make_binary();
-        b.get_binary(bin);
+        b << cin;
         // write output data to stdout
-        for (size_t i = 0; i < bin.size(); ++i)
+        for (size_t i = 0; i < b.size(); ++i)
         {
-            std::cout << bin.data()[i];
+            cout << b[i];
         }
-        std::cout.flush();
+        cout.flush();
     }
     else
     {
