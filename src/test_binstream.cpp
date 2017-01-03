@@ -10,21 +10,33 @@
 #include <fstream>
 #include <vector>
 #include "BinStream.h"
+
 using namespace std;
 
 int main()
 {
-    BinStream b;
+    BS::BinStream b;
     vector<char> bin;
-	stringstream ss;
+    stringstream ss;
+
+    // from input file to output file
     ifstream f("exemple.txt");
-    if (f.is_open())
-    {
-        ss << f.rdbuf();
-        b.add_element(ss.str());
-        b.get_binary(bin);
-        ofstream t("exemple_bs.bin");
-		t.write(bin.data(), bin.size());
-		t.close();
-    }
+    ofstream t("exemple_bs.bin");
+    b << f >> t;
+    f.close();
+    t.close();
+
+    // from strings to output file
+    b.reset();
+    b << "'hello world!'"
+            << "00112233"
+            << "big-endian"
+            << "00112233"
+            << "decimal"
+            << "00112233"
+            << "\"ok\"";
+    t.open("ex2.bin");
+    b >> t;
+    t.close();
+    return 0;
 }

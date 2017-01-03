@@ -17,7 +17,7 @@
  *
  * @return true if s starts with prefix else false
  */
-bool starts_with(const std::string &s, const std::string &prefix)
+bool BS::starts_with(const std::string &s, const std::string &prefix)
 {
     return ((prefix.size() <= s.size()) &&
             std::equal(prefix.begin(), prefix.end(), s.begin()));
@@ -31,7 +31,7 @@ bool starts_with(const std::string &s, const std::string &prefix)
  *
  * @return true if s ends with prefix else false
  */
-bool endswith(const std::string &s, const std::string &suffix)
+bool BS::endswith(const std::string &s, const std::string &suffix)
 {
     return ((s.size() >= suffix.size()) &&
             (s.compare(s.size() - suffix.size(), suffix.size(), suffix) == 0));
@@ -45,7 +45,7 @@ bool endswith(const std::string &s, const std::string &suffix)
 
  * @return a reference to the stripped string
  */
-std::string& lstrip(std::string& s)
+std::string& BS::lstrip(std::string& s)
 {
     size_t i;
     for(i = 0; i < s.size() && isspace(s[i]); ++i);
@@ -60,7 +60,7 @@ std::string& lstrip(std::string& s)
 
  * @return a reference to the stripped string
  */
-std::string& rstrip(std::string& s)
+std::string& BS::rstrip(std::string& s)
 {
     size_t i;
     for(i = s.size(); i > 0 && isspace(s[i - 1]); --i);
@@ -75,7 +75,7 @@ std::string& rstrip(std::string& s)
 
  * @return a reference to the stripped string
  */
-std::string& strip(std::string& s)
+std::string& BS::strip(std::string& s)
 {
     return rstrip(lstrip(s));
 }
