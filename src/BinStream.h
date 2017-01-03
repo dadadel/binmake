@@ -58,11 +58,17 @@ namespace BS
         void reset_output(void);
         void reset_input(void);
 
+        void set_verbosity(bool verbose);
+
         bool input_ready(void) const;
         bool output_ready(void) const;
         bool get_output(std::vector<char>& output) const;
+        size_t size(void) const;
+
+        char operator[](const size_t index) const;
 
         // Stream operators
+        BinStream& operator<<(const std::istream & s);
         BinStream& operator<<(const std::ifstream & f);
         BinStream& operator<<(const std::stringstream & desc);
         BinStream& operator<<(const std::string & desc);

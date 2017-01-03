@@ -122,7 +122,44 @@ bool BS::BinStream::get_output(std::vector<char>& output) const
     return m_output_ready;
 }
 
+size_t BS::BinStream::size(void) const
+{
+    if (m_output_ready)
+    {
+        return m_output.size();
+    }
+    return 0;
+}
+
+char BS::BinStream::operator[](const size_t index) const
+{
+    if (!m_output_ready)
+    {
+        throw BSExceptionNoOutputAvailable();
+    }
+    if (index >= m_output.size())
+    {
+        throw BSExceptionOutOfRange(index);
+    }
+    return m_output.data()[index];
+}
+
 //////////////////////////    STREAM OPERATORS    //////////////////////////////
+
+/**
+ * @brief Add and parse an input stream.
+ * The output will be updated.
+ *
+ * @param f the istream input file
+ * @return the instance
+ */
+BS::BinStream& BS::BinStream::operator<<(const std::istream & s)
+{
+    std::stringstream ss;
+    ss << s.rdbuf();
+    parse_input(ss.str());
+    return *this;
+}
 
 /**
  * @brief Add and parse an input stream from file.
@@ -481,6 +518,11 @@ void BS::BinStream::update_bin_output(const type_t stype,
     }
 }
 
+void BS::BinStream::set_verbosity(bool verbose)
+{
+    m_verbose = verbose;
+}
+
 void BS::BinStream::bs_log(std::string msg)
 {
     if (m_verbose)
@@ -488,3 +530,4 @@ void BS::BinStream::bs_log(std::string msg)
         std::clog << msg << std::endl;
     }
 }
+
