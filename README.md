@@ -1,29 +1,43 @@
 # binmake
 
-This is an open source tool for generating a binary file described by a human readable text file.
-It manage endianess, several numbers representations, raw strings.
+This is an open source tool for generating a binary file described by a human
+readable text file.
+It manages endianess, several numbers representations, raw strings.
 It ignores comments lines, empty lines, leading and ending spaces.
+
+It is written in C++11 standard.
+
+It can be used as a standalone binary or as a C++ library (static or dynamic)
+to include to you programs.
+
 
 ## How to install
 
-`binmake` is a standalone binary written in C++ with C++11 standard.
-You should build the binary and then use it.
+A Makefile allow to compile the binary and the libs.
 
-You can also compile the module as static or dynamic library to use the streaming
-class BS::BinStream in your own code.
+The library provides the class BS::BinStream allowing to manipulate streams.
 
-    $ make
+```bash
+$ git clone https://github.com/dadadel/binmake
+$ cd binmake
+$ make
+```
+
+This will compile and generate the binary `binmake` in `bin/`, the static lib
+`libbinstream.a` and the dynamic library `libbinstream.so` in `lib/`.
+The headers are in `include/`.
+
 
 ## How to use
 
 ### using the binary
 
 ```bash
-$ ./binmake exemple.txt exemple.bin
+$ ./bin/binmake exemple.txt exemple.bin
 
-$ ./makebin exemple.txt > exemple.bin
+$ ./bin/binmake exemple.txt > exemple.bin
 
-$ cat exemple.txt | ./makebin > exemple.bin
+$ cat exemple.txt | ./bin/binmake > exemple.bin
 
 $ echo '32 decimal 32 %x61 61' | ./binmake | hexdump -C
 00000000  32 20 61 3d                                       |2 a=|
@@ -75,11 +89,12 @@ decimal
 00000027
 ```
 
-# How to include in your code
+## How to include to your code
 
-The header to include is `BinStream.h`.
-The class to use is `BS::BinStream`. To make it easy you can declare the
-namespace `BS`.
+The header to include is `BinStream.h`. It needs `bs_exception.h`.
+
+The class to use is `BS::BinStream`. You can obviously use the namespace `BS`
+to deal with merely `BinStream`.
 
 You can stream the text description of you binary from: `istream`, `ifstream`,
 `string` and `stringstream`.
