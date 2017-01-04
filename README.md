@@ -18,19 +18,21 @@ class BS::BinStream in your own code.
 
 ### using the binary
 
-    $ ./binmake exemple.txt exemple.bin
+```bash
+$ ./binmake exemple.txt exemple.bin
 
-    $ ./makebin exemple.txt > exemple.bin
+$ ./makebin exemple.txt > exemple.bin
 
-    $ cat exemple.txt | ./makebin > exemple.bin
+$ cat exemple.txt | ./makebin > exemple.bin
 
-    $ echo '32 decimal 32 %x61 61' | ./binmake | hexdump -C
-    00000000  32 20 61 3d                                       |2 a=|
-    00000004
+$ echo '32 decimal 32 %x61 61' | ./binmake | hexdump -C
+00000000  32 20 61 3d                                       |2 a=|
+00000004
+```
 
 - Input file `exemple.txt`:
 
-```
+```bash
 # an exemple of file description of binary data to generate
 
 # set endianess to big-endian
