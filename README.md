@@ -19,14 +19,14 @@ class BS::BinStream in your own code.
 ### using the binary
 
     $ ./binmake exemple.txt exemple.bin
-    # or output to stdout
+
     $ ./makebin exemple.txt > exemple.bin
-    # or input/output from/to stdin/stdout
+
     $ cat exemple.txt | ./makebin > exemple.bin
 
-    # example with some ASCII:
-    $ echo '32 decimal 32 61' | ./binmake
-    2 a
+    $ echo '32 decimal 32 %x61 61' | ./binmake | hexdump -C
+    00000000  32 20 61 3d                                       |2 a=|
+    00000004
 
 - Input file `exemple.txt`:
 
