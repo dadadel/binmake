@@ -14,7 +14,7 @@ to include to you programs.
 - [BinMake](#binmake)
   * [How to install](#how-to-install)
   * [How to use the binary](#how-to-use-the-binary)
-  * [How to include in C++ code](#how-to-include-in-c++-code)
+  * [How to include in C++ code](#how-to-include-in-c-code)
   * [Brief formatting documentation](#brief-formatting-documentation)
   * [TODO](#todo)
 
