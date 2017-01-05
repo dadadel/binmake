@@ -75,6 +75,9 @@ namespace BS
         BinStream& operator>>(std::ofstream & f);
         BinStream& operator>>(std::vector<char> & output);
 
+        friend std::ostream& operator<<(std::ostream& stream, const BinStream& bin_stream);
+        friend std::istream& operator>>(std::istream& stream, BinStream& bin_stream);
+
         // Low-level functions for parsing input and generating output
         void parse_input(const std::string & element);
         void proceed_element(const std::string & element);

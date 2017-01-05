@@ -247,6 +247,39 @@ BS::BinStream& BS::BinStream::operator>>(std::ofstream & f)
     return *this;
 }
 
+namespace BS {
+/**
+ * @brief Stream the output to a friend ostream
+ *
+ * @param stream the ostream
+ * @param bin_stream the BinStream instance containing the output
+ * @return the ostream
+ */
+std::ostream& operator<<(std::ostream& stream, const BinStream& bin_stream)
+{
+    for (size_t i = 0; i < bin_stream.size(); ++i)
+    {
+        stream << bin_stream[i];
+    }
+    return stream;
+}
+
+/**
+ * @brief Add a friend istream input and parse it.
+ * The output will be updated.
+ *
+ * @param stream the istream input
+ * @param bin_stream the BinStream instance to update
+ * @return the istream
+ */
+std::istream& operator>>(std::istream& stream, BinStream& bin_stream)
+{
+    bin_stream << stream;
+    return stream;
+}
+}
+
+
 
 ///////////////////////    LOW-LEVEL FUNCTIONS    //////////////////////////////
 
