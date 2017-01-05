@@ -1,5 +1,5 @@
 //============================================================================
-// Name        : builtbin.cpp
+// Name        : binmake.cpp
 // Author      : Adel Daouzli
 // Version     :
 // Copyright   : MIT License
@@ -14,25 +14,54 @@
 using namespace std;
 using namespace BS;
 
+static const string __version("V0.1");
+
 void usage(std::string name)
 {
-    cerr << "Usage: " << name << " input_text_file [output_binary_file]" <<
-            endl;
+    cerr << "BinMake " << __version << " - Adel Daouzli - MIT License" << endl
+            << endl << "Usage: " << endl
+            << "\t" << name << " [options] [text_file [binary_file]]" << endl
+            << endl << "Description:" << endl
+            << "\tGenerates binary data from a text human readable description." << endl
+            << "\tIf `binary_file` is not provided then the output will be stdout" << endl
+            << "\t(unless using option -o)." << endl
+            << "\tIf `text_file` is not provided then the input will be stdin." << endl
+            << endl << "Options:" << endl
+            << "\t-h : show this help message and exit" << endl
+            << "\t-v : activate verbose mode" << endl
+            << "\t-o binary_file : will generate the binary output to the "
+            << "provided file name" << endl;
 }
 
 int main(int argc, char** argv)
 {
     BinStream b;
+    string output_file;
     int argoffs = 0;
 
+    // Manage options
     for (int i = 1; i < argc; ++i)
     {
         if (argv[i][0] == '-')
         {
             argoffs++;
+            // set verbose mode with -v
             if (argv[i][1] == 'v')
             {
                 b.set_verbosity(true);
+            }
+            // show help and exit with -h
+            else if (argv[i][1] == 'h')
+            {
+                usage(argv[0]);
+                return 0;
+            }
+            // get output file name with -o FILENAME
+            else if (argv[i][1] == 'o')
+            {
+                i++;
+                argoffs++;
+                output_file = argv[i];
             }
             else
             {
@@ -47,33 +76,39 @@ int main(int argc, char** argv)
         // read input data from file
         ifstream f(argv[argoffs + 1]);
         b << f;
-        if (argc == 3)
+        if ((argc == 3) || (!output_file.empty()))
         {
             // write output data to file
-            ofstream t(argv[argoffs + 2]);
+            if (output_file.empty())
+            {
+                output_file = argv[argoffs + 2];
+            }
+            ofstream t(output_file.c_str());
             b >> t;
             t.close();
         }
         else
         {
             // write output data to stdout
-            for (size_t i = 0; i < b.size(); ++i)
-            {
-                cout << b[i];
-            }
-            cout.flush();
+            cout << b;
         }
     }
     else if(argc == 1)
     {
         // read input data from stdin
-        b << cin;
-        // write output data to stdout
-        for (size_t i = 0; i < b.size(); ++i)
+        cin >> b; // can work also with b << cin;
+        if (output_file.empty())
         {
-            cout << b[i];
+            // write output data to stdout
+            cout << b;
         }
-        cout.flush();
+        else
+        {
+            // write output data to file
+            ofstream t(output_file.c_str());
+            b >> t;
+            t.close();
+        }
     }
     else
     {
