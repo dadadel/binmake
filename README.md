@@ -1,4 +1,4 @@
-# binmake
+# BinMake
 
 This is an open source tool for generating a binary file described by a human
 readable text file.
@@ -27,17 +27,35 @@ This will compile and generate the binary `binmake` in `bin/`, the static lib
 `libbinstream.a` and the dynamic library `libbinstream.so` in `lib/`.
 The headers are in `include/`.
 
+After compiling, the folder tree looks like:
 
-## How to use
+```
+|-- src/ <source code>
+|
+|-- include/
+|     |-- bs_exception.h
+|     |-- BinStream.h
+|
+|-- lib/
+|     |-- libbinstream.so
+|     |-- libbinstream.a
+|
+|-- bin/
+|     |-- binmake
+```
 
-### using the binary
+## How to use the binary
 
 ```bash
-$ ./bin/binmake exemple.txt exemple.bin
+$ mv bin/binmake .
 
-$ ./bin/binmake exemple.txt > exemple.bin
+$ ./binmake exemple.txt exemple.bin
 
-$ cat exemple.txt | ./bin/binmake > exemple.bin
+$ ./binmake exemple.txt > exemple.bin
+
+$ cat exemple.txt | ./binmake > exemple.bin
+
+$ cat exemple.txt | ./binmake -o exemple.bin
 
 $ echo '32 decimal 32 %x61 61' | ./binmake | hexdump -C
 00000000  32 20 61 3d                                       |2 a=|
@@ -89,7 +107,7 @@ decimal
 00000027
 ```
 
-## How to include to your code
+## How to use a library
 
 The header to include is `BinStream.h`. It needs `bs_exception.h`.
 
@@ -156,17 +174,34 @@ using namespace BS;
 int main()
 {
     BinStream bin;
+    cin >> bin;
+    cout << bin;
+    return 0;
+}
+```
+
+Or
+
+```c++
+#include <iostream>
+#include "BinStream.h"
+
+using namespace std;
+using namespace BS;
+
+int main()
+{
+    BinStream bin;
     bin << cin;
     for (size_t i = 0; i < bin.size(); ++i)
     {
         cout << bin[i];
     }
-    cout.flush();
     return 0;
 }
 ```
 
-- Get the output in a vector
+- Get the output in a char vector
 
 ```c++
 #include <iostream>
@@ -189,7 +224,7 @@ int main()
 }
 ```
 
-## Brief formating documentation
+## Brief formatting documentation
 
 ### Comments
 
