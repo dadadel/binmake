@@ -11,6 +11,13 @@ It can be used as a standalone binary or as a C++ library (static or dynamic)
 to include to you programs.
 
 
+- [BinMake](#binmake)
+  * [How to install](#how-to-install)
+  * [How to use the binary](#how-to-use-the-binary)
+  * [How to include in C++ code](#how-to-include-in-c++-code)
+  * [Brief formatting documentation](#brief-formatting-documentation)
+  * [TODO](#todo)
+
 ## How to install
 
 A Makefile allow to compile the binary and the libs.
@@ -107,7 +114,9 @@ decimal
 00000027
 ```
 
-## How to use a library
+## How to include in C++ code
+
+You can either link with the static library or the dynamic library.
 
 The header to include is `BinStream.h`. It needs `bs_exception.h`.
 
@@ -305,4 +314,9 @@ If one of these keywords is found, then all furthur found number without an
 explicit interpretation will be interpreted as a **binary number**.
 
 
+## TODO
 
+- Manage float/double numbers.
+- Update tests (broken) and cover all functions
+- Manage several string lines
+- Manage formatting syntax errors (writting `%a` instead of `%xa` will crash)
