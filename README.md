@@ -126,7 +126,7 @@ to deal with merely `BinStream`.
 You can stream the text description of you binary from: `istream`, `ifstream`,
 `string` and `stringstream`.
 
-You can stream the output binary to: `vector<char>` and `ofstream`.
+You can stream the output binary to: `vector<char>`, `ostream` and `ofstream`.
 
 There follow some examples.
 
