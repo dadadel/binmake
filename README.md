@@ -267,6 +267,10 @@ the size of the string representation will determine the output binary number
 size. Thus, "%x0000" (or "0000" if default is hexa) will generate a 16 bits
 number instead of 8 bits.
 
+Furthermore, it is possible to force a size for a number of any type by adding
+the size in bytes between brackets (2, 4 or 8). For instance, the decimal number
+`0123` will be encoded on one byte while `0123[4]` will be encoded on 4 bytes.
+
 For the numbers represented on 16, 32 and 64 bits, the default endianess is
 little-endian unless it was changed (see Keywords).
 

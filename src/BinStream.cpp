@@ -452,7 +452,11 @@ void BS::BinStream::update_bin_output(const type_t stype,
         const endianess_t etype, const std::string& s)
 {
     const char *p;
+    size_t pos;
+    size_t pos2;
     uint64_t val_u64;
+    std::string s2;
+    int size = 1;
 
     p = s.c_str();
 
@@ -488,6 +492,18 @@ void BS::BinStream::update_bin_output(const type_t stype,
             throw BSExceptionBadType(stype);
         }
 
+        // check if size is provided
+        pos = s.find('[');
+        if (pos != std::string::npos)
+        {
+            pos2 = s.find(']');
+            if (pos2 == std::string::npos)
+            {
+                pos2 = s.size();
+            }
+            s2 = s.substr(pos + 1, pos2 - 1);
+            size = std::stoul(s, 0, 10);
+        }
         // convert from ascii to number
         val_u64 = (uint64_t)std::stoul(s, 0, base);
         p = (char*)&val_u64;
@@ -495,7 +511,7 @@ void BS::BinStream::update_bin_output(const type_t stype,
         // big-endian
         if (etype == big_endian)
         {
-            if ((val_u64 > MAX_U32b_VALUE) ||
+            if ((size == 8) || (val_u64 > MAX_U32b_VALUE) ||
                     ((stype == t_num_hexadecimal) && (s.size() > 8)))
             {
                 m_output.push_back(p[7]);
@@ -503,13 +519,13 @@ void BS::BinStream::update_bin_output(const type_t stype,
                 m_output.push_back(p[5]);
                 m_output.push_back(p[4]);
             }
-            if ((val_u64 > MAX_U16b_VALUE) ||
+            if ((size >= 4) || (val_u64 > MAX_U16b_VALUE) ||
                     ((stype == t_num_hexadecimal) && (s.size() > 4)))
             {
                 m_output.push_back(p[3]);
                 m_output.push_back(p[2]);
             }
-            if (val_u64 > MAX_U8b_VALUE)
+            if ((size >= 2) || (val_u64 > MAX_U8b_VALUE))
             {
                 m_output.push_back(p[1]);
                 m_output.push_back(p[0]);
@@ -523,7 +539,7 @@ void BS::BinStream::update_bin_output(const type_t stype,
         // little-endian
         else
         {
-            if (val_u64 > MAX_U8b_VALUE)
+            if ((size >= 2) || (val_u64 > MAX_U8b_VALUE))
             {
                 m_output.push_back(p[0]);
                 m_output.push_back(p[1]);
@@ -532,13 +548,13 @@ void BS::BinStream::update_bin_output(const type_t stype,
             {
                 m_output.push_back(p[0]);
             }
-            if ((val_u64 > MAX_U16b_VALUE) ||
+            if ((size >= 4) || (val_u64 > MAX_U16b_VALUE) ||
                     ((stype == t_num_hexadecimal) && (s.size() > 4)))
             {
                 m_output.push_back(p[2]);
                 m_output.push_back(p[3]);
             }
-            if ((val_u64 > MAX_U32b_VALUE) ||
+            if ((size == 8) || (val_u64 > MAX_U32b_VALUE) ||
                     ((stype == t_num_hexadecimal) && (s.size() > 8)))
             {
                 m_output.push_back(p[4]);
