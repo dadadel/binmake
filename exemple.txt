@@ -6,7 +6,7 @@ big-endian
 # default number is hexadecimal
 00112233
 
-# man can explicit a number type: prefix %b means binary number
+# man can explicit a number type: %b means binary number
 %b0100110111100000
 
 # change endianess to little-endian
@@ -21,8 +21,11 @@ little-endian
 # change default to decimal
 decimal
 
-# following number is now decimal
+# following number is now decimal on one byte due to its value
 0123
+
+# following number is now decimal forced to 4 bytes
+0123[4]
 
 # strings are delimited by " or '
 "this is some raw string"

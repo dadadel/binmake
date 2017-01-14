@@ -95,8 +95,11 @@ little-endian
 # change default to decimal
 decimal
 
-# following number is now decimal
+# following number is now decimal on one byte due to its value
 0123
+
+# following number is now decimal forced to 4 bytes
+0123[4]
 
 # strings are delimited by " or '
 "this is some raw string"
@@ -108,10 +111,10 @@ decimal
 - Output file`exemple.bin`:
 
 ```
-00000000  00 11 22 33 4d e0 77 66  55 44 88 99 aa bb 7b 74  |.."3M.wfUD....{t|
-00000010  68 69 73 20 69 73 20 73  6f 6d 65 20 72 61 77 20  |his is some raw |
-00000020  73 74 72 69 6e 67 ff                              |string.|
-00000027
+00000000  00 11 22 33 4d e0 77 66  55 44 88 99 aa bb 7b 7b  |.."3M.wfUD....{{|
+00000010  00 00 00 74 68 69 73 20  69 73 20 73 6f 6d 65 20  |...this is some |
+00000020  72 61 77 20 73 74 72 69  6e 67 ff                 |raw string.|
+0000002b
 ```
 
 ## How to include in C++ code
