@@ -80,6 +80,7 @@ namespace BS
 
         // Low-level functions for parsing input and generating output
         void parse_input(const std::string & element);
+        bool check_grammar(const std::string & element, type_t elem_type);
         void proceed_element(const std::string & element);
         void update_bin_output(const type_t stype, const endianess_t etype, const std::string& s);
 
