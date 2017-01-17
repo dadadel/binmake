@@ -11,6 +11,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <regex>
 
 #include "utils.h"
 #include "BinStream.h"
@@ -326,6 +327,34 @@ void BS::BinStream::parse_input(const std::string & element)
     }
 }
 
+bool BS::BinStream::check_grammar(const std::string & element, type_t elem_type)
+{
+    bool ret(false);
+    std::regex pattern;
+    switch(elem_type)
+    {
+    case t_string:
+        break;
+    case t_num_hexadecimal:
+        pattern = R"([\da-fA-F]+)";
+        ret = std::regex_match(element, pattern);
+        break;
+    case t_num_decimal:
+        pattern = R"((+|-)?\d+)";
+        ret = std::regex_match(element, pattern);
+        break;
+    case t_num_octal:
+        pattern = R"((+|-)?[0-7]+)";
+        ret = std::regex_match(element, pattern);
+        break;
+    case t_num_binary:
+        pattern = R"([0-1]+)";
+        ret = std::regex_match(element, pattern);
+        break;
+    }
+    return ret;
+}
+
 /**
  * @brief Proceed an element and update the output.
  *
@@ -504,6 +533,9 @@ void BS::BinStream::update_bin_output(const type_t stype,
             s2 = s.substr(pos + 1, pos2 - 1);
             size = std::stoul(s, 0, 10);
         }
+        std::stringstream tmps;
+        tmps << stype << ": check grammar:" << std::boolalpha << check_grammar(s, stype);
+        bs_log(tmps.str());
         // convert from ascii to number
         val_u64 = (uint64_t)std::stoul(s, 0, base);
         p = (char*)&val_u64;
