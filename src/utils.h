@@ -14,6 +14,7 @@
 
 namespace BS
 {
+    #define PREFIX_NUMBER "%"
     #define PREFIX_NUMBER_DECIMAL "%d"
     #define PREFIX_NUMBER_HEXADECIMAL "%x"
     #define PREFIX_NUMBER_BINARY "%b"
