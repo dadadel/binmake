@@ -24,8 +24,22 @@ namespace BS
         t_num_octal,
         t_num_binary,
         t_string,
-        t_none
+        t_none,
+        t_error
     } type_t;
+
+    typedef enum
+    {
+        t_int8,
+        t_uint8,
+        t_int16,
+        t_uint16,
+        t_int32,
+        t_uint32,
+        t_int64,
+        t_uint64,
+        t_error
+    } type_number_t;
 
     typedef enum
     {
@@ -33,6 +47,21 @@ namespace BS
         big_endian
     } endianess_t;
 
+    typedef union
+    {
+        type_number_t type;
+        union
+        {
+            uint8_t value_i8;
+            int8_t value_u8;
+            uint16_t value_i16;
+            int16_t value_u16;
+            uint32_t value_i32;
+            int32_t value_u32;
+            uint64_t value_i64;
+            int64_t value_u64;
+        }
+    } number_t;
 
     class BinStream
     {
@@ -80,7 +109,10 @@ namespace BS
 
         // Low-level functions for parsing input and generating output
         void parse_input(const std::string & element);
+        type_t get_type(const std::string & element);
         bool check_grammar(const std::string & element, type_t elem_type);
+        void extract_number(number_t number, const std::string & element,
+                const type_number_t & element_type, const endianess_t & endianess, const int size);
         void proceed_element(const std::string & element);
         void update_bin_output(const type_t stype, const endianess_t etype, const std::string& s);
 

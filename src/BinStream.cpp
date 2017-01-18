@@ -334,6 +334,7 @@ bool BS::BinStream::check_grammar(const std::string & element, type_t elem_type)
     switch(elem_type)
     {
     case t_string:
+        //TODO
         break;
     case t_num_hexadecimal:
         pattern = R"([\da-fA-F]+)";
@@ -354,6 +355,132 @@ bool BS::BinStream::check_grammar(const std::string & element, type_t elem_type)
     }
     return ret;
 }
+
+/**
+ * @brief Get the type of an element
+ *
+ * @param element the element to determine type
+ * @return the detected type
+ */
+type_t BS::BinStream::get_type(const std::string & element)
+{
+    type_t ret = t_none;
+    bool res_comp;
+
+    std::regex pattern;
+
+    // Element is an explicit number
+
+    if (starts_with(element, PREFIX_NUMBER))
+    {
+        pattern = R"(%[dxbo]{1}\S+)";
+        res_comp = std::regex_match(element, pattern);
+        if (!res_comp)
+        {
+            ret = t_error;
+        }
+        else
+        {
+            if (starts_with(element, PREFIX_NUMBER_HEXADECIMAL))
+            {
+                ret = t_num_hexadecimal;
+            }
+            else if (starts_with(element, PREFIX_NUMBER_DECIMAL))
+            {
+                ret = t_num_decimal;
+            }
+            else if (starts_with(element, PREFIX_NUMBER_OCTAL))
+            {
+                ret = t_num_octal;
+            }
+            else if (starts_with(element, PREFIX_NUMBER_BINARY))
+            {
+                ret = t_num_binary;
+            }
+            else
+            {
+                ret = t_error;
+            }
+        }
+    }
+
+    // Element is a string
+
+    else if ((starts_with(element, "\"") || starts_with(element, "\'")))
+    {
+        ret = t_string;
+    }
+
+    return ret;
+}
+
+void BS::BinStream::extract_number(number_t number, const std::string & element,
+        const type_number_t & element_type, const endianess_t & endianess, const int size)
+{
+    //TODO
+    ;
+    // convert from ascii to number
+    val_u64 = (uint64_t)std::stoul(s, 0, base);
+    p = (char*)&val_u64;
+
+    // big-endian
+    if (etype == big_endian)
+    {
+        if ((size == 8) || (val_u64 > MAX_U32b_VALUE) ||
+                ((stype == t_num_hexadecimal) && (s.size() > 8)))
+        {
+            m_output.push_back(p[7]);
+            m_output.push_back(p[6]);
+            m_output.push_back(p[5]);
+            m_output.push_back(p[4]);
+        }
+        if ((size >= 4) || (val_u64 > MAX_U16b_VALUE) ||
+                ((stype == t_num_hexadecimal) && (s.size() > 4)))
+        {
+            m_output.push_back(p[3]);
+            m_output.push_back(p[2]);
+        }
+        if ((size >= 2) || (val_u64 > MAX_U8b_VALUE))
+        {
+            m_output.push_back(p[1]);
+            m_output.push_back(p[0]);
+        }
+        else
+        {
+            m_output.push_back(p[0]);
+        }
+        m_output_ready = true;
+    }
+    // little-endian
+    else
+    {
+        if ((size >= 2) || (val_u64 > MAX_U8b_VALUE))
+        {
+            m_output.push_back(p[0]);
+            m_output.push_back(p[1]);
+        }
+        else
+        {
+            m_output.push_back(p[0]);
+        }
+        if ((size >= 4) || (val_u64 > MAX_U16b_VALUE) ||
+                ((stype == t_num_hexadecimal) && (s.size() > 4)))
+        {
+            m_output.push_back(p[2]);
+            m_output.push_back(p[3]);
+        }
+        if ((size == 8) || (val_u64 > MAX_U32b_VALUE) ||
+                ((stype == t_num_hexadecimal) && (s.size() > 8)))
+        {
+            m_output.push_back(p[4]);
+            m_output.push_back(p[5]);
+            m_output.push_back(p[6]);
+            m_output.push_back(p[7]);
+        }
+        m_output_ready = true;
+    }
+}
+
 
 /**
  * @brief Proceed an element and update the output.
