@@ -352,6 +352,12 @@ bool BS::BinStream::check_grammar(const std::string & element, type_t elem_type)
         pattern = R"([0-1]+)";
         ret = std::regex_match(element, pattern);
         break;
+    case t_none:
+        //TODO
+        break;
+    case t_error:
+        //TODO
+        break;
     }
     return ret;
 }
@@ -417,17 +423,22 @@ type_t BS::BinStream::get_type(const std::string & element)
 void BS::BinStream::extract_number(number_t number, const std::string & element,
         const type_number_t & element_type, const endianess_t & endianess, const int size)
 {
+    uint64_t val_u64;
+    int base;
+    endianess_t etype;
+    type_t stype;
+    char *p;
     //TODO
     ;
     // convert from ascii to number
-    val_u64 = (uint64_t)std::stoul(s, 0, base);
+    val_u64 = (uint64_t)std::stoul(element, 0, base);
     p = (char*)&val_u64;
 
     // big-endian
     if (etype == big_endian)
     {
         if ((size == 8) || (val_u64 > MAX_U32b_VALUE) ||
-                ((stype == t_num_hexadecimal) && (s.size() > 8)))
+                ((stype == t_num_hexadecimal) && (element.size() > 8)))
         {
             m_output.push_back(p[7]);
             m_output.push_back(p[6]);
@@ -435,7 +446,7 @@ void BS::BinStream::extract_number(number_t number, const std::string & element,
             m_output.push_back(p[4]);
         }
         if ((size >= 4) || (val_u64 > MAX_U16b_VALUE) ||
-                ((stype == t_num_hexadecimal) && (s.size() > 4)))
+                ((stype == t_num_hexadecimal) && (element.size() > 4)))
         {
             m_output.push_back(p[3]);
             m_output.push_back(p[2]);
@@ -464,13 +475,13 @@ void BS::BinStream::extract_number(number_t number, const std::string & element,
             m_output.push_back(p[0]);
         }
         if ((size >= 4) || (val_u64 > MAX_U16b_VALUE) ||
-                ((stype == t_num_hexadecimal) && (s.size() > 4)))
+                ((stype == t_num_hexadecimal) && (element.size() > 4)))
         {
             m_output.push_back(p[2]);
             m_output.push_back(p[3]);
         }
         if ((size == 8) || (val_u64 > MAX_U32b_VALUE) ||
-                ((stype == t_num_hexadecimal) && (s.size() > 8)))
+                ((stype == t_num_hexadecimal) && (element.size() > 8)))
         {
             m_output.push_back(p[4]);
             m_output.push_back(p[5]);

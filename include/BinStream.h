@@ -38,7 +38,7 @@ namespace BS
         t_uint32,
         t_int64,
         t_uint64,
-        t_error
+        t_number_error
     } type_number_t;
 
     typedef enum
@@ -60,7 +60,7 @@ namespace BS
             int32_t value_u32;
             uint64_t value_i64;
             int64_t value_u64;
-        }
+        };
     } number_t;
 
     class BinStream
