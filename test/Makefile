@@ -1,8 +1,8 @@
-BIN_PATH=..
+BIN_PATH=../bin
 SRC_PATH=../src
-INC_PATH=$(SRC_PATH)
+INC_PATH=../include
 SOURCES = main_test.cpp \
-          $(SRC_PATH)/BinMaker.cpp \
+          $(SRC_PATH)/BinStream.cpp \
           $(SRC_PATH)/utils.cpp
 TARGET = $(BIN_PATH)/test_binmake
 OBJECTS=$(notdir $(SOURCES:.cpp=.o))
