@@ -341,15 +341,15 @@ bool BS::BinStream::check_grammar(const std::string & element, type_t elem_type)
         ret = std::regex_match(element, pattern);
         break;
     case t_num_decimal:
-        pattern = R"((+|-)?\d+)";
+        pattern = R"([+-]?\d+)";
         ret = std::regex_match(element, pattern);
         break;
     case t_num_octal:
-        pattern = R"((+|-)?[0-7]+)";
+        pattern = R"([+-]?[0-7]+)";
         ret = std::regex_match(element, pattern);
         break;
     case t_num_binary:
-        pattern = R"([0-1]+)";
+        pattern = R"([01]+)";
         ret = std::regex_match(element, pattern);
         break;
     case t_none:
