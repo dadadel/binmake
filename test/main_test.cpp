@@ -2,46 +2,96 @@
 #include "catch.hpp"
 #include <iostream>
 #include <sstream>
+#include <string>
 #include "BinStream.h"
 
 using namespace BS;
+using namespace std;
 
-TEST_CASE( "Check failure to make binary", "[binmake]" )
+
+TEST_CASE("REGEX methods")
+{
+    SECTION("Get the type of an element")
+    {
+        BinStream b;
+        string s;
+
+        s = "'blabla'";
+        REQUIRE( b.get_type(s) == t_string );
+
+        s = "\"blabla\"";
+        REQUIRE( b.get_type(s) == t_string );
+
+        // Explicit numbers
+
+        s = "%x023";
+        REQUIRE( b.get_type(s) == t_num_hexadecimal );
+        s = s.substr(2, s.size() - 2);
+        cout<<"s="<<s<<endl;
+        REQUIRE( b.check_grammar(s, t_num_hexadecimal) );
+
+        s = "%d-023";
+        REQUIRE( b.get_type(s) == t_num_decimal );
+        s = s.substr(2, s.size() - 2);
+        REQUIRE( b.check_grammar(s, t_num_decimal) );
+
+        s = "%o023";
+        REQUIRE( b.get_type(s) == t_num_octal );
+        s = s.substr(2, s.size() - 2);
+        REQUIRE( b.check_grammar(s, t_num_octal) );
+
+        s = "%b01101";
+        REQUIRE( b.get_type(s) == t_num_binary );
+        s = s.substr(2, s.size() - 2);
+        REQUIRE( b.check_grammar(s, t_num_binary) );
+
+        s = "%0101";
+        REQUIRE( b.get_type(s) == t_error );
+
+        // default number is hexa
+        s = "023";
+        REQUIRE( b.get_type(s) == t_num_hexadecimal );
+    }
+}
+
+TEST_CASE( "Check failure to make binary", "[binstream]" )
 {
 
     SECTION( "- don't get binary if no input available" )
     {
         BinStream b;
-        std::vector<char> output;
+        vector<char> output;
         REQUIRE( b.get_output(output) == false );
     }
 
 }
 
-TEST_CASE( "Check success to make binary", "[binmake]" )
+TEST_CASE( "Check success to make binary", "[binstream]" )
 {
 
     BinStream b;
-    std::stringstream ss;
-    std::vector<char> output;
+    stringstream ss;
+    vector<char> output;
+    ss << "big-endian"
+        << " 00010203"
+        << " little-endian"
+        << " 04050607";
 
     SECTION( "- get input from a stringstream" )
     {
-        ss << "big-endian"
-            << " 00010203"
-            << " little-endian"
-            << " 04050607";
         b << ss;
         REQUIRE( b.input_ready() == true );
     }
 
     SECTION( "- produced an output binary from a stringstream" )
     {
+        b << ss;
         REQUIRE( b.output_ready() == true );
     }
 
     SECTION( "- made binary endianess valid" )
     {
+        b << ss;
         REQUIRE( b.size() == 8);
         REQUIRE( b[0] == 0x00 );
         REQUIRE( b[1] == 0x01 );
@@ -55,6 +105,7 @@ TEST_CASE( "Check success to make binary", "[binmake]" )
 
     SECTION( "- reset the data" )
     {
+        b << ss;
         b.reset();
         REQUIRE( b.input_ready() == false);
         REQUIRE( b.output_ready() == false);
