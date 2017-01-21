@@ -22,5 +22,8 @@ $(TARGET): $(OBJECTS)
 %.o: %.cpp
 	$(CXX) -o $@ -c $< $(INC) $(CFLAGS)
 
+run-test: $(TARGET)
+	$(TARGET)
+
 clean:
 	rm -rf *.o $(TARGET)
