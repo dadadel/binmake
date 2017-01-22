@@ -327,6 +327,14 @@ void BS::BinStream::parse_input(const std::string & element)
     }
 }
 
+/**
+ * @brief Check that an element is conform to the grammar of type it is supposed
+ * to be.
+ *
+ * @param element the element to check
+ * @param elem_type the supposed type of the element
+ * @return true if the element is valid else false
+ */
 bool BS::BinStream::check_grammar(const std::string & element, type_t elem_type)
 {
     bool ret(false);
@@ -337,19 +345,19 @@ bool BS::BinStream::check_grammar(const std::string & element, type_t elem_type)
         //TODO
         break;
     case t_num_hexadecimal:
-        pattern = R"([\da-fA-F]+)";
+        pattern = R"((%x)?[\da-fA-F]+)";
         ret = std::regex_match(element, pattern);
         break;
     case t_num_decimal:
-        pattern = R"([+-]?\d+)";
+        pattern = R"((%d)?[+-]?\d+)";
         ret = std::regex_match(element, pattern);
         break;
     case t_num_octal:
-        pattern = R"([+-]?[0-7]+)";
+        pattern = R"((%o)?[+-]?[0-7]+)";
         ret = std::regex_match(element, pattern);
         break;
     case t_num_binary:
-        pattern = R"([01]+)";
+        pattern = R"((%b)?[01]+)";
         ret = std::regex_match(element, pattern);
         break;
     case t_none:
@@ -417,6 +425,86 @@ type_t BS::BinStream::get_type(const std::string & element)
         ret = t_string;
     }
 
+    return ret;
+}
+
+void BS::BinStream::add_number_to_vector_char(std::vector<char> & v, const number_t number)
+{
+    if (number.endianess == big_endian)
+    {
+        for (int i = number.size-1; i >= 0; --i)
+        {
+            v.push_back(number.value_p[i]);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < number.size; ++i)
+        {
+            v.push_back(number.value_p[i]);
+        }
+    }
+}
+
+/**
+ * @brief Build a number a number from a string element.
+ *
+ * @param element the element representing the number
+ * @param number will store the extracted number
+ * @param elem_type the supposed type of the element (should be a number type)
+ * @param size the size in bytes of the target element. If 0 will determine
+ * a size based on its value if decimal or octal or the number of characters
+ * if hexadecimal or binary (default 0)
+ * @return true if the number was extracted else false
+ */
+bool BS::BinStream::build_number(const std::string & element, type_number_t number,
+        const type_t elem_type, const endianess_t endian, const int size)
+{
+    bool ret(true);
+    int base;
+
+    // check size
+    if ((size != 0) && (size != 1) && (size != 2) && (size != 4) && (size != 8))
+    {
+        ret = false;
+        bs_log("Invalid target size " + std::to_string(size) + " for number to extract");
+    }
+    // check number grammar
+    if (!check_grammar(element, elem_type))
+    {
+        ret = false;
+        bs_log("Invalid element type " + std::to_string(elem_type) + " for number to extract");
+    }
+    // check base
+    if (ret)
+    {
+        switch(elem_type)
+        {
+        case t_num_hexadecimal:
+            base = 16;
+            break;
+        case t_num_decimal:
+            base = 10;
+            break;
+        case t_num_octal:
+            base = 8;
+            break;
+        case t_num_binary:
+            base = 2;
+            break;
+        default:
+            bs_log("Bad element type " + std::to_string(elem_type) + "for a number");
+            ret = false;
+            break;
+        }
+    }
+    // prepare string (if prefixed) and check sign
+    // convert ascii to number
+    // determine size
+    if (size == 0)
+    {
+        //TODO
+    }
     return ret;
 }
 
@@ -491,7 +579,11 @@ void BS::BinStream::extract_number(number_t number, const std::string & element,
         m_output_ready = true;
     }
 }
-
+/*
+void BS::BinStream::workflow()
+{
+    ;
+}*/
 
 /**
  * @brief Proceed an element and update the output.
