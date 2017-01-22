@@ -11,7 +11,7 @@ using namespace std;
 
 TEST_CASE("REGEX methods")
 {
-    SECTION("Get the type of an element")
+    SECTION("Get and check the type of an element")
     {
         BinStream b;
         string s;
@@ -26,24 +26,27 @@ TEST_CASE("REGEX methods")
 
         s = "%x023";
         REQUIRE( b.get_type(s) == t_num_hexadecimal );
-        s = s.substr(2, s.size() - 2);
-        cout<<"s="<<s<<endl;
+        REQUIRE( b.check_grammar(s, t_num_hexadecimal) );
+        s = "%x0a3";
         REQUIRE( b.check_grammar(s, t_num_hexadecimal) );
 
         s = "%d-023";
         REQUIRE( b.get_type(s) == t_num_decimal );
-        s = s.substr(2, s.size() - 2);
         REQUIRE( b.check_grammar(s, t_num_decimal) );
+        s = "%d0a3";
+        REQUIRE( b.check_grammar(s, t_num_decimal) == false );
 
         s = "%o023";
         REQUIRE( b.get_type(s) == t_num_octal );
-        s = s.substr(2, s.size() - 2);
         REQUIRE( b.check_grammar(s, t_num_octal) );
+        s = "%o09";
+        REQUIRE( b.check_grammar(s, t_num_octal) == false );
 
         s = "%b01101";
         REQUIRE( b.get_type(s) == t_num_binary );
-        s = s.substr(2, s.size() - 2);
         REQUIRE( b.check_grammar(s, t_num_binary) );
+        s = "%b01102";
+        REQUIRE( b.check_grammar(s, t_num_binary) == false );
 
         s = "%0101";
         REQUIRE( b.get_type(s) == t_error );
@@ -51,6 +54,16 @@ TEST_CASE("REGEX methods")
         // default number is hexa
         s = "023";
         REQUIRE( b.get_type(s) == t_num_hexadecimal );
+    }
+
+    SECTION("Extract numbers")
+    {
+        BinStream b;
+        string s;
+        type_number_t num;
+
+        s = "42";
+        REQUIRE( b.build_number(s, num, t_num_decimal, big_endian, 4) );
     }
 }
 

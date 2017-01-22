@@ -50,16 +50,13 @@ namespace BS
     typedef union
     {
         type_number_t type;
+        endianess_t endianess;
+        int size;
         union
         {
-            uint8_t value_i8;
-            int8_t value_u8;
-            uint16_t value_i16;
-            int16_t value_u16;
-            uint32_t value_i32;
-            int32_t value_u32;
             uint64_t value_i64;
             int64_t value_u64;
+            char *value_p;
         };
     } number_t;
 
@@ -111,6 +108,9 @@ namespace BS
         void parse_input(const std::string & element);
         type_t get_type(const std::string & element);
         bool check_grammar(const std::string & element, type_t elem_type);
+        void add_number_to_vector_char(std::vector<char> & v, const number_t number);
+        bool build_number(const std::string & element, type_number_t number,
+                const type_t elem_type, const endianess_t endian, const int size=0);
         void extract_number(number_t number, const std::string & element,
                 const type_number_t & element_type, const endianess_t & endianess, const int size);
         void proceed_element(const std::string & element);
