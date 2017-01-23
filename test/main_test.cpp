@@ -62,7 +62,7 @@ TEST_CASE("REGEX methods")
         string s;
         type_number_t num;
 
-        s = "42";
+        s = "-42";
         REQUIRE( b.build_number(s, num, t_num_decimal, big_endian, 4) );
     }
 }

@@ -11,6 +11,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <math.h>
 #include <regex>
 
 #include "utils.h"
@@ -345,19 +346,19 @@ bool BS::BinStream::check_grammar(const std::string & element, type_t elem_type)
         //TODO
         break;
     case t_num_hexadecimal:
-        pattern = R"((%x)?[\da-fA-F]+)";
+        pattern = R"((%x)?[\da-fA-F]+(\[\d+\])?)";
         ret = std::regex_match(element, pattern);
         break;
     case t_num_decimal:
-        pattern = R"((%d)?[+-]?\d+)";
+        pattern = R"((%d)?[+-]?\d+(\[\d+\])?)";
         ret = std::regex_match(element, pattern);
         break;
     case t_num_octal:
-        pattern = R"((%o)?[+-]?[0-7]+)";
+        pattern = R"((%o)?[0-7]+(\[\d+\])?)";
         ret = std::regex_match(element, pattern);
         break;
     case t_num_binary:
-        pattern = R"((%b)?[01]+)";
+        pattern = R"((%b)?[01]+(\[\d+\])?)";
         ret = std::regex_match(element, pattern);
         break;
     case t_none:
@@ -458,10 +459,18 @@ void BS::BinStream::add_number_to_vector_char(std::vector<char> & v, const numbe
  * @return true if the number was extracted else false
  */
 bool BS::BinStream::build_number(const std::string & element, type_number_t number,
-        const type_t elem_type, const endianess_t endian, const int size)
+        const type_t elem_type, const endianess_t endian, const int elem_size)
 {
     bool ret(true);
     int base;
+    bool num_signed;
+    std::string s;
+    std::regex pattern;
+    std::smatch match;
+    int64_t val_i64;
+    uint64_t val_u64;
+    int nb_char = 0;
+    int size = elem_size;
 
     // check size
     if ((size != 0) && (size != 1) && (size != 2) && (size != 4) && (size != 8))
@@ -482,6 +491,7 @@ bool BS::BinStream::build_number(const std::string & element, type_number_t numb
         {
         case t_num_hexadecimal:
             base = 16;
+            nb_char = 2;
             break;
         case t_num_decimal:
             base = 10;
@@ -491,19 +501,109 @@ bool BS::BinStream::build_number(const std::string & element, type_number_t numb
             break;
         case t_num_binary:
             base = 2;
+            nb_char = 8;
             break;
         default:
-            bs_log("Bad element type " + std::to_string(elem_type) + "for a number");
+            bs_log("Bad element type " + std::to_string(elem_type) + " for a number");
             ret = false;
             break;
         }
     }
-    // prepare string (if prefixed) and check sign
-    // convert ascii to number
-    // determine size
-    if (size == 0)
+    // prepare string (if prefixed/suffixed) and check sign
+    pattern = R"((%\w{1})?([+-]?[\da-fA-F]+)(\[\d+\])?)";
+    if (!std::regex_search(element.begin(), element.end(), match, pattern))
     {
-        //TODO
+        bs_log("Failed to parse element number '" + element + "'");
+        ret = false;
+    }
+    else
+    {
+        s = match[2];
+    }
+    // convert ASCII to number
+    if (ret)
+    {
+        if (starts_with(s, "-"))
+        {
+            num_signed = true;
+            val_i64 = (uint64_t)std::stoll(s, 0, base);
+        }
+        else
+        {
+            num_signed = false;
+            val_u64 = (uint64_t)std::stoull(s, 0, base);
+        }
+    }
+    // determine size
+    if (ret && (size == 0))
+    {
+        switch(elem_type)
+        {
+        // hexa and binary depend on number of characters
+        case t_num_hexadecimal:
+        case t_num_binary:
+            if (s.size() > (4 * nb_char))
+            {
+                size = 8;
+            }
+            else if (s.size() > (2 * nb_char))
+            {
+                size = 4;
+            }
+            else if (s.size() > (1 * nb_char))
+            {
+                size = 2;
+            }
+            else
+            {
+                size = 1;
+            }
+            break;
+        // decimal and octal depend on the value
+        case t_num_decimal:
+        case t_num_octal:
+            int n;
+            int b;
+            int64_t bits;
+            if (num_signed && (elem_type == t_num_decimal))
+            {
+                for (int i=2; i >= 0; i--)
+                {
+                    b = pow(2, i);
+                    n = b * 8;
+                    bits = pow(2, n-1);
+                    // min (negative) and max values in bits
+                    if ((val_i64 > (bits - 1)) || (val_i64 < (-bits)))
+                    {
+                        size = b * 2;
+                        break;
+                    }
+                }
+            }
+            else if (!num_signed)
+            {
+                for (int i=2; i >= 0; i--)
+                {
+                    b = pow(2, i);
+                    n = b * 8;
+                    bits = pow(2, n);
+                    if (val_u64 > (bits - 1))
+                    {
+                        size = b * 2;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                //TODO bs_log("Unexpected error (signed = %d, elem type = %d)", (int)num_signed, (int)elem_type);
+                std::cerr << "Unexpected error (signed = " << num_signed << ", elem type = " << elem_type << std::endl;
+            }
+            if (size == 0)
+            {
+                size = 1;
+            }
+        }
     }
     return ret;
 }
