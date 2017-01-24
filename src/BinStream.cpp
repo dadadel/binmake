@@ -23,6 +23,7 @@ BS::BinStream::BinStream(bool verbose)
         : m_input(), m_output(),
           m_curr_endianess(little_endian),
           m_curr_numbers(t_num_hexadecimal),
+          m_curr_size(0),
           m_input_ready(false),
           m_output_ready(false),
           m_verbose(verbose)
@@ -32,6 +33,7 @@ BS::BinStream::BinStream(bool verbose)
 BS::BinStream::BinStream(const BS::BinStream& o)
         : m_curr_endianess(o.m_curr_endianess),
           m_curr_numbers(o.m_curr_numbers),
+          m_curr_size(0),
           m_input_ready(o.m_input_ready),
           m_output_ready(o.m_output_ready),
           m_verbose(o.m_verbose)
@@ -289,9 +291,7 @@ std::istream& operator>>(std::istream& stream, BinStream& bin_stream)
 /**
  * @brief Parse an input and update the output.
  *
- *
  * @param element the string containing the input data to proceed
- * @return the instance
  */
 void BS::BinStream::parse_input(const std::string & element)
 {
@@ -329,6 +329,101 @@ void BS::BinStream::parse_input(const std::string & element)
 }
 
 /**
+ * @brief Proceed an input and update the output.
+ *
+ * @param element the string containing the input data to proceed
+ */
+void BS::BinStream::proceed_input(const std::string & element)
+{
+    std::stringstream sselem(element);
+    std::string line;
+
+    m_input << element;
+    m_input_ready = true;
+
+    while(getline(sselem, line))
+    {
+        strip(line);
+
+        // comment so ignore the line
+        if (starts_with(line, "#") || line.size() == 0)
+        {
+            bs_log("<ignore line>");
+        }
+        // line is a string
+        else if(starts_with(line, "\"") || starts_with(line, "\'"))
+        {
+            proceed_input(line);
+        }
+        // other: parse the line word after word
+        else
+        {
+            std::stringstream ss(line);
+            std::string word;
+            while(ss >> word)
+            {
+                proceed_input(word);
+            }
+        }
+    }
+}
+
+/**
+ * @brief Proceed an element and update the output if success
+ *
+ * @param element the element to proceed
+ */
+void BS::BinStream::workflow(const std::string & element)
+{
+    type_t elem_type;
+    number_t number;
+    bool update_bin(false);
+
+    number.is_set = false;
+    elem_type = get_type(element);
+    if ((elem_type == t_error))
+    {
+        //TODO
+        bs_log("Error in workflow");
+    }
+    // not explicit number
+    else if (elem_type == t_none)
+    {
+        elem_type = m_curr_numbers;
+    }
+    // action
+    else if (elem_type == t_action)
+    {
+        update_internal(element);
+    }
+    else
+    {
+        // nothing to do now
+    }
+
+    // build number
+    if ((elem_type != t_error) && (elem_type != t_action) &&
+            (elem_type != t_none) && (elem_type != t_string))
+    {
+        update_bin = build_number(element, number, elem_type, m_curr_endianess, m_curr_size);
+    }
+    else
+    {
+        //TODO
+    }
+    // update the binary output
+    if (update_bin)
+    {
+        if (number.is_set)
+        {
+            add_number_to_vector_char(m_output, number);
+            m_output_ready = true;
+        }
+        //TODO
+    }
+}
+
+/**
  * @brief Check that an element is conform to the grammar of type it is supposed
  * to be.
  *
@@ -344,6 +439,7 @@ bool BS::BinStream::check_grammar(const std::string & element, type_t elem_type)
     {
     case t_string:
         //TODO
+        ret = true;
         break;
     case t_num_hexadecimal:
         pattern = R"((%x)?[\da-fA-F]+(\[\d+\])?)";
@@ -360,6 +456,9 @@ bool BS::BinStream::check_grammar(const std::string & element, type_t elem_type)
     case t_num_binary:
         pattern = R"((%b)?[01]+(\[\d+\])?)";
         ret = std::regex_match(element, pattern);
+        break;
+    case t_action:
+        ret = is_action(element);
         break;
     case t_none:
         //TODO
@@ -426,6 +525,144 @@ type_t BS::BinStream::get_type(const std::string & element)
         ret = t_string;
     }
 
+    else
+    {
+        // Element is an action
+        if (is_action(element))
+        {
+            ret = t_action;
+        }
+    }
+
+    return ret;
+}
+
+/**
+ * @brief Check if an element is an action
+ *
+ * @return true if is an action
+ */
+bool BS::BinStream::is_action(const std::string & element)
+{
+    bool ret = false;
+    std::string s(element);
+
+    strip(s);
+
+    // check endianess
+
+    if ((s == "little-endian") || (s == "big-endian"))
+    {
+        ret = true;
+    }
+
+    // check number type
+
+    else if ((s == "hexadecimal") || (s == "hexa") || (s == "hex"))
+    {
+        ret = true;
+    }
+    else if ((s == "decimal") || (s == "dec"))
+    {
+        ret = true;
+    }
+    else if ((s == "octal") || (s == "oct"))
+    {
+        ret = true;
+    }
+    else if ((s == "binary") || (s == "bin"))
+    {
+        ret = true;
+    }
+
+    // check size
+
+    else if (starts_with(s, "size"))
+    {
+        ret = true;
+    }
+
+    return ret;
+}
+
+/**
+ * @brief Update internal state
+ * @return true if success else false
+ */
+bool BS::BinStream::update_internal(const std::string & element)
+{
+    bool ret(true);
+    std::string s(element);
+    std::string stmp(element);
+    std::regex pattern;
+    std::smatch match;
+    int size = 0;
+
+    strip(s);
+
+    // update endianess
+
+    if (s == "little-endian")
+    {
+        m_curr_endianess = little_endian;
+    }
+    else if (s == "big-endian")
+    {
+        m_curr_endianess = big_endian;
+    }
+
+    // update number type
+
+    else if ((s == "hexadecimal") || (s == "hexa") || (s == "hex"))
+    {
+        m_curr_numbers = t_num_hexadecimal;
+    }
+    else if ((s == "decimal") || (s == "dec"))
+    {
+        m_curr_numbers = t_num_decimal;
+    }
+    else if ((s == "octal") || (s == "oct"))
+    {
+        m_curr_numbers = t_num_octal;
+    }
+    else if ((s == "binary") || (s == "bin"))
+    {
+        m_curr_numbers = t_num_binary;
+    }
+
+    // update size
+
+    else if (starts_with(s, "size"))
+    {
+        // extract the size
+        pattern = R"(size\[(\d+)\])";
+        if (!std::regex_search(((const std::string)s).begin(), ((const std::string)s).end(), match, pattern))
+        {
+            ret = false;
+            bs_log("Failed to parse action size '" + s + "'");
+        }
+        else
+        {
+            stmp = match[1];
+            size = std::stoi(stmp, 0, 10);
+            if ((size == 0) || (size == 1) || (size == 2) ||
+                    (size == 4) || (size == 8))
+            {
+                m_curr_size = size;
+            }
+            else
+            {
+                ret = false;
+                bs_log("Bad size " + std::to_string(size) + " for default size. Should be 0, 1, 2, 4 or 8");
+            }
+        }
+    }
+
+    else
+    {
+        bs_log("Unknown action '" + s + "'");
+        ret = false;
+    }
     return ret;
 }
 
@@ -448,17 +685,18 @@ void BS::BinStream::add_number_to_vector_char(std::vector<char> & v, const numbe
 }
 
 /**
- * @brief Build a number a number from a string element.
+ * @brief Build a number represented in a string.
  *
- * @param element the element representing the number
+ * @param element the string representing the number
  * @param number will store the extracted number
  * @param elem_type the supposed type of the element (should be a number type)
  * @param size the size in bytes of the target element. If 0 will determine
  * a size based on its value if decimal or octal or the number of characters
  * if hexadecimal or binary (default 0)
+ * size will be ignored if a size is explicitly provided (e.g. "12[4]" -> size 4)
  * @return true if the number was extracted else false
  */
-bool BS::BinStream::build_number(const std::string & element, type_number_t number,
+bool BS::BinStream::build_number(const std::string & element, number_t  & number,
         const type_t elem_type, const endianess_t endian, const int elem_size)
 {
     bool ret(true);
@@ -469,9 +707,10 @@ bool BS::BinStream::build_number(const std::string & element, type_number_t numb
     std::smatch match;
     int64_t val_i64;
     uint64_t val_u64;
-    int nb_char = 0;
+    unsigned int nb_char = 0;
     int size = elem_size;
 
+    number.is_set = false;
     // check size
     if ((size != 0) && (size != 1) && (size != 2) && (size != 4) && (size != 8))
     {
@@ -509,7 +748,7 @@ bool BS::BinStream::build_number(const std::string & element, type_number_t numb
             break;
         }
     }
-    // prepare string (if prefixed/suffixed) and check sign
+    // extract the number part substring and eventually the size if explicit
     pattern = R"((%\w{1})?([+-]?[\da-fA-F]+)(\[\d+\])?)";
     if (!std::regex_search(element.begin(), element.end(), match, pattern))
     {
@@ -518,6 +757,14 @@ bool BS::BinStream::build_number(const std::string & element, type_number_t numb
     }
     else
     {
+        // get size if provided
+        s = match[3];
+        if (!s.empty())
+        {
+            s = s.substr(1, s.size() - 2);
+            size = std::stoi(s, 0, 10);
+        }
+        // get substring representing the number (with possible sign)
         s = match[2];
     }
     // convert ASCII to number
@@ -526,7 +773,7 @@ bool BS::BinStream::build_number(const std::string & element, type_number_t numb
         if (starts_with(s, "-"))
         {
             num_signed = true;
-            val_i64 = (uint64_t)std::stoll(s, 0, base);
+            val_i64 = (int64_t)std::stoll(s, 0, base);
         }
         else
         {
@@ -534,7 +781,7 @@ bool BS::BinStream::build_number(const std::string & element, type_number_t numb
             val_u64 = (uint64_t)std::stoull(s, 0, base);
         }
     }
-    // determine size
+    // determine size if still not done
     if (ret && (size == 0))
     {
         switch(elem_type)
@@ -564,9 +811,9 @@ bool BS::BinStream::build_number(const std::string & element, type_number_t numb
         case t_num_octal:
             int n;
             int b;
-            int64_t bits;
             if (num_signed && (elem_type == t_num_decimal))
             {
+                int64_t bits;
                 for (int i=2; i >= 0; i--)
                 {
                     b = pow(2, i);
@@ -584,10 +831,11 @@ bool BS::BinStream::build_number(const std::string & element, type_number_t numb
             {
                 for (int i=2; i >= 0; i--)
                 {
+                    uint64_t ubits;
                     b = pow(2, i);
                     n = b * 8;
-                    bits = pow(2, n);
-                    if (val_u64 > (bits - 1))
+                    ubits = pow(2, n);
+                    if (val_u64 > (ubits - 1))
                     {
                         size = b * 2;
                         break;
@@ -596,6 +844,7 @@ bool BS::BinStream::build_number(const std::string & element, type_number_t numb
             }
             else
             {
+                ret = false;
                 //TODO bs_log("Unexpected error (signed = %d, elem type = %d)", (int)num_signed, (int)elem_type);
                 std::cerr << "Unexpected error (signed = " << num_signed << ", elem type = " << elem_type << std::endl;
             }
@@ -603,87 +852,63 @@ bool BS::BinStream::build_number(const std::string & element, type_number_t numb
             {
                 size = 1;
             }
+            break;
+        default:
+            bs_log("Unexpected element type. This should never happen !");
+            ret = false;
+            break;
+        }
+    }
+    // set the number
+    if (ret)
+    {
+        number.is_set = true;
+        number.endianess = endian;
+        if (num_signed)
+        {
+            number.value_i64 = val_i64;
+            number.num_signed = true;
+        }
+        else
+        {
+            number.value_u64 = val_u64;
+            number.num_signed = false;
+        }
+        number.size = size;
+        switch(size)
+        {
+        case 1:
+            number.type = t_8bits;
+            break;
+        case 2:
+            number.type = t_16bits;
+            break;
+        case 4:
+            number.type = t_32bits;
+            break;
+        case 8:
+            number.type = t_64bits;
+            break;
+        default:
+            ret = false;
+            number.is_set = false;
+            bs_log("Unexpected size !");
+            break;
         }
     }
     return ret;
 }
 
-void BS::BinStream::extract_number(number_t number, const std::string & element,
-        const type_number_t & element_type, const endianess_t & endianess, const int size)
+/**
+ * @brief Extract to a string a number from binary data. The string is built
+ * following a representation provided in a string description
+ */
+void BS::BinStream::extract_number(std::string & str_number, const std::vector<char> element,
+        const std::string & description, const type_number_t & element_type,
+        const endianess_t & endianess, const int size)
 {
-    uint64_t val_u64;
-    int base;
-    endianess_t etype;
-    type_t stype;
-    char *p;
     //TODO
-    ;
-    // convert from ascii to number
-    val_u64 = (uint64_t)std::stoul(element, 0, base);
-    p = (char*)&val_u64;
-
-    // big-endian
-    if (etype == big_endian)
-    {
-        if ((size == 8) || (val_u64 > MAX_U32b_VALUE) ||
-                ((stype == t_num_hexadecimal) && (element.size() > 8)))
-        {
-            m_output.push_back(p[7]);
-            m_output.push_back(p[6]);
-            m_output.push_back(p[5]);
-            m_output.push_back(p[4]);
-        }
-        if ((size >= 4) || (val_u64 > MAX_U16b_VALUE) ||
-                ((stype == t_num_hexadecimal) && (element.size() > 4)))
-        {
-            m_output.push_back(p[3]);
-            m_output.push_back(p[2]);
-        }
-        if ((size >= 2) || (val_u64 > MAX_U8b_VALUE))
-        {
-            m_output.push_back(p[1]);
-            m_output.push_back(p[0]);
-        }
-        else
-        {
-            m_output.push_back(p[0]);
-        }
-        m_output_ready = true;
-    }
-    // little-endian
-    else
-    {
-        if ((size >= 2) || (val_u64 > MAX_U8b_VALUE))
-        {
-            m_output.push_back(p[0]);
-            m_output.push_back(p[1]);
-        }
-        else
-        {
-            m_output.push_back(p[0]);
-        }
-        if ((size >= 4) || (val_u64 > MAX_U16b_VALUE) ||
-                ((stype == t_num_hexadecimal) && (element.size() > 4)))
-        {
-            m_output.push_back(p[2]);
-            m_output.push_back(p[3]);
-        }
-        if ((size == 8) || (val_u64 > MAX_U32b_VALUE) ||
-                ((stype == t_num_hexadecimal) && (element.size() > 8)))
-        {
-            m_output.push_back(p[4]);
-            m_output.push_back(p[5]);
-            m_output.push_back(p[6]);
-            m_output.push_back(p[7]);
-        }
-        m_output_ready = true;
-    }
 }
-/*
-void BS::BinStream::workflow()
-{
-    ;
-}*/
 
 /**
  * @brief Proceed an element and update the output.
