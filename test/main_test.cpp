@@ -56,14 +56,68 @@ TEST_CASE("REGEX methods")
         REQUIRE( b.get_type(s) == t_num_hexadecimal );
     }
 
-    SECTION("Extract numbers")
+    SECTION("Build numbers")
     {
-        BinStream b;
+        BinStream b(true);
         string s;
-        type_number_t num;
+        number_t num;
 
         s = "-42";
         REQUIRE( b.build_number(s, num, t_num_decimal, big_endian, 4) );
+        REQUIRE( num.endianess == big_endian );
+        REQUIRE( num.size == 4 );
+        REQUIRE( num.type == t_32bits );
+        REQUIRE( num.num_signed );
+        REQUIRE( num.value_i64 == -42 );
+
+        s = "42";
+        REQUIRE( b.build_number(s, num, t_num_decimal, big_endian) );
+        REQUIRE( num.endianess == big_endian );
+        REQUIRE( num.size == 1 );
+        REQUIRE( num.type == t_8bits );
+        REQUIRE( !num.num_signed );
+        REQUIRE( num.value_u64 == 42 );
+
+        s = "%xa42";
+        REQUIRE( b.build_number(s, num, t_num_hexadecimal, big_endian) );
+        REQUIRE( num.endianess == big_endian );
+        REQUIRE( num.size == 2 );
+        REQUIRE( num.type == t_16bits );
+        REQUIRE( !num.num_signed );
+        REQUIRE( num.value_u64 == 0x0a42 );
+
+        REQUIRE( b.build_number(s, num, t_num_hexadecimal, little_endian) );
+        REQUIRE( num.endianess == little_endian );
+        REQUIRE( num.value_u64 == 0x0a42 );
+
+        s = "000a42";
+        REQUIRE( b.build_number(s, num, t_num_hexadecimal, big_endian) );
+        REQUIRE( num.endianess == big_endian );
+        REQUIRE( num.size == 4 );
+        REQUIRE( num.type == t_32bits );
+        REQUIRE( !num.num_signed );
+        REQUIRE( num.value_u64 == 0x0a42 );
+    }
+}
+
+TEST_CASE( "Check Workflow", "[binstream]" )
+{
+    SECTION ( "actions")
+    {
+        BinStream b(true);
+        stringstream ss;
+        vector<char> output;
+        ss << "big-endian"
+            << " 0001";
+        b << ss;
+        REQUIRE( b.update_internal("little-endian") );
+        b << " 0203";
+        REQUIRE( b.size() == 4);
+        REQUIRE( b[0] == 0x00 );
+        REQUIRE( b[1] == 0x01 );
+        REQUIRE( b[2] == 0x03 );
+        REQUIRE( b[3] == 0x02 );
+
     }
 }
 
