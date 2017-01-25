@@ -682,9 +682,6 @@ void BS::BinStream::update_bin_output(const type_t stype,
             s2 = s.substr(pos + 1, pos2 - 1);
             size = std::stoul(s, 0, 10);
         }
-        std::stringstream tmps;
-        tmps << stype << ": check grammar:" << std::boolalpha << check_grammar(s, stype);
-        bs_log(tmps.str());
         // convert from ascii to number
         val_u64 = (uint64_t)std::stoul(s, 0, base);
         p = (char*)&val_u64;
