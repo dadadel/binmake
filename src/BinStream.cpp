@@ -1112,7 +1112,8 @@ void BS::BinStream::update_bin_output(const type_t stype,
                 m_output.push_back(p[3]);
                 m_output.push_back(p[2]);
             }
-            if ((size >= 2) || (val_u64 > MAX_U8b_VALUE))
+            if ((size >= 2) || (val_u64 > MAX_U8b_VALUE) ||
+                    ((stype == t_num_hexadecimal) && (s.size() > 2)))
             {
                 m_output.push_back(p[1]);
                 m_output.push_back(p[0]);
@@ -1126,7 +1127,8 @@ void BS::BinStream::update_bin_output(const type_t stype,
         // little-endian
         else
         {
-            if ((size >= 2) || (val_u64 > MAX_U8b_VALUE))
+            if ((size >= 2) || (val_u64 > MAX_U8b_VALUE) ||
+                    ((stype == t_num_hexadecimal) && (s.size() > 2)))
             {
                 m_output.push_back(p[0]);
                 m_output.push_back(p[1]);
