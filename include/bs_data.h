@@ -51,7 +51,6 @@ namespace BS
         {
             uint64_t value_u64;
             int64_t value_i64;
-            char *value_p;
         };
     } number_t;
 }
