@@ -29,6 +29,8 @@ namespace BS
     std::string& rstrip(std::string& s);
     std::string& strip(std::string& s);
     bool endswith(const std::string &str, const std::string &suffix);
+    void log_message(const std::string & msg);
+    void error_message(const std::string & msg);
 }
 
 class ExceptionBBInterpretation

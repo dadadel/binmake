@@ -13,52 +13,11 @@
 #include <string>
 #include <vector>
 
+#include "bs_data.h"
 #include "bs_exception.h"
 
 namespace BS
 {
-    typedef enum
-    {
-        t_num_hexadecimal,
-        t_num_decimal,
-        t_num_octal,
-        t_num_binary,
-        t_string,
-        t_action,
-        t_none,
-        t_error
-    } type_t;
-
-    typedef enum
-    {
-        t_8bits,
-        t_16bits,
-        t_32bits,
-        t_64bits,
-        t_number_error
-    } type_number_t;
-
-    typedef enum
-    {
-        little_endian,
-        big_endian
-    } endianess_t;
-
-    typedef struct
-    {
-        bool is_set;
-        type_number_t type;
-        endianess_t endianess;
-        int size;
-        bool num_signed;
-        union
-        {
-            uint64_t value_u64;
-            int64_t value_i64;
-            char *value_p;
-        };
-    } number_t;
-
     class BinStream
     {
     private:
@@ -105,19 +64,10 @@ namespace BS
         friend std::istream& operator>>(std::istream& stream, BinStream& bin_stream);
 
         // Low-level functions for parsing input and generating output
-        bool is_action(const std::string & element);
         bool update_internal(const std::string & element);
         void parse_input(const std::string & element);
         void proceed_input(const std::string & element);
         void workflow(const std::string & element);
-        type_t get_type(const std::string & element);
-        bool check_grammar(const std::string & element, type_t elem_type);
-        void add_number_to_vector_char(std::vector<char> & v, const number_t number);
-        bool build_number(const std::string & element, number_t & number,
-                const type_t elem_type, const endianess_t endian, const int size=0);
-        void extract_number(std::string & str_number, const std::vector<char> element,
-                const std::string & description, const type_number_t & element_type,
-                const endianess_t & endianess, const int size);
         void proceed_element(const std::string & element);
         void update_bin_output(const type_t stype, const endianess_t etype, const std::string& s);
 

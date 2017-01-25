@@ -6,6 +6,7 @@
 // Description : Useful functions
 //============================================================================
 
+#include <iostream>
 #include "utils.h"
 
 
@@ -78,4 +79,22 @@ std::string& BS::rstrip(std::string& s)
 std::string& BS::strip(std::string& s)
 {
     return rstrip(lstrip(s));
+}
+
+/**
+ * @brief Print a message in logs
+ * @param msg the message to print in logs
+ */
+void BS::log_message(const std::string & msg)
+{
+    std::clog << msg << std::endl;
+}
+
+/**
+ * @brief Print a message in error output
+ * @param msg the message to print in error output
+ */
+void BS::error_message(const std::string & msg)
+{
+    std::cerr << msg << std::endl;
 }

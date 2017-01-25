@@ -2,9 +2,11 @@ BIN_PATH=../bin
 LIB_PATH=../lib
 SOURCES = BinStream.cpp \
           binmake.cpp \
+          bin_tools.cpp \
           utils.cpp
 SOURCES_LIB = BinStream.cpp \
-	          utils.cpp
+              bin_tools.cpp \
+              utils.cpp
 INC_PATH = ../include
 INC = -I. -I$(INC_PATH)
 TARGET_BIN = $(BIN_PATH)/binmake
