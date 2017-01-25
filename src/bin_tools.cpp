@@ -127,18 +127,20 @@ BS::type_t BS::get_type(const std::string & element)
  */
 void BS::add_number_to_vector_char(std::vector<char> & v, const number_t number)
 {
+    char *p;
+    p = (char*)((void*)&number.value_u64);
     if (number.endianess == big_endian)
     {
         for (int i = number.size-1; i >= 0; --i)
         {
-            v.push_back(number.value_p[i]);
+            v.push_back(p[i]);
         }
     }
     else
     {
         for (int i = 0; i < number.size; ++i)
         {
-            v.push_back(number.value_p[i]);
+            v.push_back(p[i]);
         }
     }
 }
