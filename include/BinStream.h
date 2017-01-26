@@ -65,11 +65,8 @@ namespace BS
 
         // Low-level functions for parsing input and generating output
         bool update_internal(const std::string & element);
-        void parse_input(const std::string & element);
         void proceed_input(const std::string & element);
         void workflow(const std::string & element);
-        void proceed_element(const std::string & element);
-        void update_bin_output(const type_t stype, const endianess_t etype, const std::string& s);
 
         void bs_log(std::string msg);
         void bs_error(std::string msg);
