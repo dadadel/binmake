@@ -146,8 +146,9 @@ void BS::add_number_to_vector_char(std::vector<char> & v, const number_t number)
 }
 
 /**
- * @brief Check if an element is an action
+ * @brief Check if an element is an internal state action
  *
+ * @param element the string element to check
  * @return true if is an action
  */
 bool BS::is_action(const std::string & element)
@@ -190,6 +191,154 @@ bool BS::is_action(const std::string & element)
         ret = true;
     }
 
+    return ret;
+}
+
+/**
+ * @brief Get the type of state
+ *
+ * @param element the string element to process
+ * @param state_type will contain the type
+ * @return true if is success else false
+ */
+bool BS::get_state_type(const std::string & element, state_type_t & state_type)
+{
+    bool ret = true;
+    std::string s(element);
+
+    strip(s);
+
+    // check endianess
+
+    if ((s == "little-endian") || (s == "big-endian"))
+    {
+        state_type = t_state_type_endianess;
+    }
+
+    // check number type
+
+    else if ((s == "hexadecimal") || (s == "hexa") || (s == "hex"))
+    {
+        state_type = t_state_type_number;
+    }
+    else if ((s == "decimal") || (s == "dec"))
+    {
+        state_type = t_state_type_number;
+    }
+    else if ((s == "octal") || (s == "oct"))
+    {
+        state_type = t_state_type_number;
+    }
+    else if ((s == "binary") || (s == "bin"))
+    {
+        state_type = t_state_type_number;
+    }
+
+    // check size
+
+    else if (starts_with(s, "size"))
+    {
+        state_type = t_state_type_size;
+    }
+    else
+    {
+        ret = false;
+    }
+
+    return ret;
+}
+
+/**
+ * @brief Extract size provided in internal state 'size'
+ * The size in bytes should be provided between brackets (e.g. "size[4]")
+ *
+ * @param str_size the string containing the state with the size
+ * @param size will contain the extracted size
+ * @return true if success else false
+ */
+
+bool BS::set_size(const std::string & str_size, int & size)
+{
+    bool ret(false);
+    std::string s;
+    std::regex pattern;
+    std::smatch match;
+    int value;
+
+    pattern = R"(size\[(\d+)\])";
+    if ( std::regex_search((str_size).begin(), (str_size).end(), match, pattern) )
+    {
+        s = match[1];
+        value = std::stoi(s, 0, 10);
+        if ((value == 0) || (value == 1) || (value == 2) ||
+                (value == 4) || (value == 8))
+        {
+            size = value;
+            ret = true;
+        }
+        else
+        {
+            error_message("Bad size " + std::to_string(value) + " for default size. Should be 0, 1, 2, 4 or 8");
+        }
+    }
+    return ret;
+}
+
+/**
+ * @brief Extract endianess
+ *
+ * @param str_endian the string containing the endianess
+ * @param endianess will contain the endianess
+ * @true if success else false
+ */
+bool BS::set_endianess(const std::string & str_endian, endianess_t & endianess)
+{
+    bool ret(true);
+    if (str_endian == "little-endian")
+    {
+        endianess = little_endian;
+    }
+    else if (str_endian == "big-endian")
+    {
+        endianess = big_endian;
+    }
+    else
+    {
+        ret = false;
+    }
+    return ret;
+}
+
+/**
+ * @brief Extract number type (hexadecimal, decimal,...)
+ *
+ * @param str_num the string containing the number type
+ * @param num_type will contain the number type
+ * @true if success else false
+ */
+bool BS::set_number_type(const std::string & str_num, type_t & num_type)
+{
+    bool ret(true);
+    if ((str_num == "hexadecimal") || (str_num == "hexa") || (str_num == "hex"))
+    {
+        num_type = t_num_hexadecimal;
+    }
+    else if ((str_num == "decimal") || (str_num == "dec"))
+    {
+        num_type = t_num_decimal;
+    }
+    else if ((str_num == "octal") || (str_num == "oct"))
+    {
+        num_type = t_num_octal;
+    }
+    else if ((str_num == "binary") || (str_num == "bin"))
+    {
+        num_type = t_num_binary;
+    }
+    else
+    {
+        ret = false;
+    }
     return ret;
 }
 
