@@ -16,6 +16,8 @@ TEST_CASE("Test of bin_tools functions")
 
         REQUIRE( get_type("'blabla'") == t_string );
         REQUIRE( get_type("\"blabla\"") == t_string );
+        REQUIRE( get_type("'some text with spaces !'") == t_string );
+        REQUIRE( get_type("'and text with\ttabs and\nreturn to line'") == t_string );
 
         // Cannot determine type so None
 
