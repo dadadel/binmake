@@ -348,12 +348,12 @@ void BS::BinStream::proceed_input(const std::string & element)
         // comment so ignore the line
         if (starts_with(line, "#") || line.size() == 0)
         {
-            bs_log("<ignore line>");
+            bs_log("<ignore comment line>");
         }
         // line is a string
         else if(starts_with(line, "\"") || starts_with(line, "\'"))
         {
-            proceed_input(line);
+            workflow(line);
         }
         // other: parse the line word after word
         else
@@ -362,7 +362,7 @@ void BS::BinStream::proceed_input(const std::string & element)
             std::string word;
             while(ss >> word)
             {
-                proceed_input(word);
+                workflow(word);
             }
         }
     }
@@ -377,49 +377,55 @@ void BS::BinStream::workflow(const std::string & element)
 {
     type_t elem_type;
     number_t number;
-    bool update_bin(false);
+    const char *p;
+    std::string s(element);
 
     number.is_set = false;
     elem_type = get_type(element);
-    if ((elem_type == t_error))
+    switch(elem_type)
     {
+    case t_error:
         //TODO
-        bs_log("Error in workflow");
-    }
-    // not explicit number
-    else if (elem_type == t_none)
-    {
-        elem_type = m_curr_numbers;
-    }
+        bs_log("Error in workflow: bad element type");
+        break;
     // action
-    else if (elem_type == t_action)
-    {
+    case t_action:
         update_internal(element);
-    }
-    else
-    {
-        // nothing to do now
-    }
-
-    // build number
-    if ((elem_type != t_error) && (elem_type != t_action) &&
-            (elem_type != t_none) && (elem_type != t_string))
-    {
-        update_bin = build_number(element, number, elem_type, m_curr_endianess, m_curr_size);
-    }
-    else
-    {
-        //TODO
-    }
-    // update the binary output
-    if (update_bin)
-    {
-        if (number.is_set)
+        break;
+    // string
+    case t_string:
+        if (starts_with(s, "\"") || starts_with(s, "\'"))
         {
-            add_number_to_vector_char(m_output, number);
+            bs_log("<string to bin>");
+            // remove delimiters
+            s = s.substr(1, s.size() - 2);
+            p = s.c_str();
+            // update the binary output
+            m_output.insert(m_output.end(), p, p + s.size());
             m_output_ready = true;
         }
-        //TODO
+        else
+        {
+            bs_error("Type string but not starting with string's delimiter !");
+        }
+        break;
+    // not explicit number
+    case t_none:
+        elem_type = m_curr_numbers;
+        // no break
+    // number
+    default:
+        if(build_number(element, number, elem_type, m_curr_endianess, m_curr_size))
+        {
+            // update the binary output
+            if (number.is_set)
+            {
+                bs_log("<number to bin>");
+                add_number_to_vector_char(m_output, number);
+                m_output_ready = true;
+            }
+        }
+        break;
     }
 }
 
@@ -758,5 +764,10 @@ void BS::BinStream::bs_log(std::string msg)
     {
         log_message(msg);
     }
+}
+
+void BS::BinStream::bs_error(std::string msg)
+{
+    error_message(msg);
 }
 

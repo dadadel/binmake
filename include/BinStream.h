@@ -72,6 +72,7 @@ namespace BS
         void update_bin_output(const type_t stype, const endianess_t etype, const std::string& s);
 
         void bs_log(std::string msg);
+        void bs_error(std::string msg);
     };
 }
 
