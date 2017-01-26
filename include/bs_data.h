@@ -15,6 +15,15 @@ namespace BS
 {
     typedef enum
     {
+        t_state_type_string,
+        t_state_type_number,
+        t_state_type_size,
+        t_state_type_endianess,
+        t_state_type_error
+    } state_type_t;
+
+    typedef enum
+    {
         t_num_hexadecimal,
         t_num_decimal,
         t_num_octal,

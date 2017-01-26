@@ -400,72 +400,37 @@ bool BS::BinStream::update_internal(const std::string & element)
     std::string stmp(element);
     std::regex pattern;
     std::smatch match;
-    int size = 0;
+    state_type_t state_type(t_state_type_error);
 
     strip(s);
 
+    ret = get_state_type(s, state_type);
+    switch(state_type)
+    {
     // update endianess
-
-    if (s == "little-endian")
-    {
-        m_curr_endianess = little_endian;
-    }
-    else if (s == "big-endian")
-    {
-        m_curr_endianess = big_endian;
-    }
+    case t_state_type_endianess:
+        set_endianess(s, m_curr_endianess);
+        break;
 
     // update number type
-
-    else if ((s == "hexadecimal") || (s == "hexa") || (s == "hex"))
-    {
-        m_curr_numbers = t_num_hexadecimal;
-    }
-    else if ((s == "decimal") || (s == "dec"))
-    {
-        m_curr_numbers = t_num_decimal;
-    }
-    else if ((s == "octal") || (s == "oct"))
-    {
-        m_curr_numbers = t_num_octal;
-    }
-    else if ((s == "binary") || (s == "bin"))
-    {
-        m_curr_numbers = t_num_binary;
-    }
+    case t_state_type_number:
+        set_number_type(s, m_curr_numbers);
+        break;
 
     // update size
-
-    else if (starts_with(s, "size"))
-    {
+    case t_state_type_size:
         // extract the size
-        pattern = R"(size\[(\d+)\])";
-        if (!std::regex_search(((const std::string)s).begin(), ((const std::string)s).end(), match, pattern))
+        if (!set_size(s, m_curr_size))
         {
             ret = false;
-            bs_log("Failed to parse action size '" + s + "'");
+            bs_log("Failed to extract size from string '" + s + "'");
         }
-        else
-        {
-            stmp = match[1];
-            size = std::stoi(stmp, 0, 10);
-            if ((size == 0) || (size == 1) || (size == 2) ||
-                    (size == 4) || (size == 8))
-            {
-                m_curr_size = size;
-            }
-            else
-            {
-                ret = false;
-                bs_log("Bad size " + std::to_string(size) + " for default size. Should be 0, 1, 2, 4 or 8");
-            }
-        }
-    }
+        break;
 
-    else
-    {
-        bs_log("Unknown action '" + s + "'");
+    default:
+        bs_log("Unknown state action '" + s + "'");
         ret = false;
+        break;
     }
     return ret;
 }
