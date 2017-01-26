@@ -161,7 +161,7 @@ BS::BinStream& BS::BinStream::operator<<(const std::istream & s)
 {
     std::stringstream ss;
     ss << s.rdbuf();
-    parse_input(ss.str());
+    proceed_input(ss.str());
     return *this;
 }
 
@@ -179,7 +179,7 @@ BS::BinStream& BS::BinStream::operator<<(const std::ifstream & f)
     if (f.is_open())
     {
         ss << f.rdbuf();
-        parse_input(ss.str());
+        proceed_input(ss.str());
     }
     return *this;
 }
@@ -193,7 +193,7 @@ BS::BinStream& BS::BinStream::operator<<(const std::ifstream & f)
  */
 BS::BinStream& BS::BinStream::operator<<(const std::stringstream & desc)
 {
-    parse_input(desc.str());
+    proceed_input(desc.str());
     return *this;
 }
 
@@ -206,7 +206,7 @@ BS::BinStream& BS::BinStream::operator<<(const std::stringstream & desc)
  */
 BS::BinStream& BS::BinStream::operator<<(const std::string & desc)
 {
-    parse_input(desc);
+    proceed_input(desc);
     return *this;
 }
 
@@ -287,46 +287,6 @@ std::istream& operator>>(std::istream& stream, BinStream& bin_stream)
 
 ///////////////////////    LOW-LEVEL FUNCTIONS    //////////////////////////////
 
-
-/**
- * @brief Parse an input and update the output.
- *
- * @param element the string containing the input data to proceed
- */
-void BS::BinStream::parse_input(const std::string & element)
-{
-    std::stringstream sselem(element);
-    std::string line;
-
-    m_input << element;
-    m_input_ready = true;
-
-    while(getline(sselem, line))
-    {
-        strip(line);
-
-        // comment so ignore the line
-        if (starts_with(line, "#") || line.size() == 0)
-        {
-            bs_log("<ignore line>");
-        }
-        // line is a string
-        else if(starts_with(line, "\"") || starts_with(line, "\'"))
-        {
-            proceed_element(line);
-        }
-        // other: parse the line word after word
-        else
-        {
-            std::stringstream ss(line);
-            std::string word;
-            while(ss >> word)
-            {
-                proceed_element(word);
-            }
-        }
-    }
-}
 
 /**
  * @brief Proceed an input and update the output.
@@ -412,7 +372,7 @@ void BS::BinStream::workflow(const std::string & element)
     // not explicit number
     case t_none:
         elem_type = m_curr_numbers;
-        // no break
+        /* no break */
     // number
     default:
         if(build_number(element, number, elem_type, m_curr_endianess, m_curr_size))
@@ -510,248 +470,6 @@ bool BS::BinStream::update_internal(const std::string & element)
     return ret;
 }
 
-/**
- * @brief Proceed an element and update the output.
- *
- *
- * @param element the string containing the input data to proceed
- * @return the instance
- */
-void BS::BinStream::proceed_element(const std::string & element)
-{
-    std::string s(element);
-    type_t curr_type;
-
-    strip(s);
-
-    // change current endianess
-
-    if(s == "little-endian")
-    {
-        bs_log("<default endianess little-endian>");
-        m_curr_endianess = little_endian;
-    }
-    else if(s == "big-endian")
-    {
-        bs_log("<default endianess big-endian>");
-        m_curr_endianess = big_endian;
-    }
-
-    // change current number type
-
-    else if ((s == "hexadecimal") || (s == "hexa") || (s == "hex"))
-    {
-        bs_log("<default mode hexadecimal>");
-        m_curr_numbers = t_num_hexadecimal;
-    }
-    else if ((s == "decimal") || (s == "dec"))
-    {
-        bs_log("<default mode decimal>");
-        m_curr_numbers = t_num_decimal;
-    }
-    else if ((s == "octal") || (s == "oct"))
-    {
-        bs_log("<default mode octal>");
-        m_curr_numbers = t_num_octal;
-    }
-    else if ((s == "binary") || (s == "bin"))
-    {
-        bs_log("<default mode binary>");
-        m_curr_numbers = t_num_binary;
-    }
-
-    // convert the input into binary output
-
-    else
-    {
-        // string
-        if (starts_with(s, "\"") || starts_with(s, "\'"))
-        {
-            bs_log("<string>");
-            // remove delimiters
-            s = s.substr(1, s.size() - 2);
-            curr_type = t_string;
-            update_bin_output(curr_type, m_curr_endianess, s);
-        }
-
-        // number(s)
-        else
-        {
-            // explicit hexa number
-            if (starts_with(s, PREFIX_NUMBER_HEXADECIMAL))
-            {
-                bs_log("<explicit hexa>");
-                s = s.substr(2, s.size() - 2);
-                curr_type = t_num_hexadecimal;
-            }
-
-            // explicit decimal number
-            else if (starts_with(s, PREFIX_NUMBER_DECIMAL))
-            {
-                bs_log("<explicit decimal>");
-                s = s.substr(2, s.size() - 2);
-                curr_type = t_num_decimal;
-            }
-
-            // explicit octal number
-            else if (starts_with(s, PREFIX_NUMBER_OCTAL))
-            {
-                bs_log("<explicit octal>");
-                s = s.substr(2, s.size() - 2);
-                curr_type = t_num_octal;
-            }
-
-            // explicit binary number
-            else if (starts_with(s, PREFIX_NUMBER_BINARY))
-            {
-                bs_log("<explicit binary>");
-                s = s.substr(2, s.size() - 2);
-                curr_type = t_num_binary;
-            }
-
-            // number with current type
-            else
-            {
-                bs_log("<number>");
-                curr_type = m_curr_numbers;
-            }
-            update_bin_output(curr_type, m_curr_endianess, s);
-        }
-    }
-}
-
-
-/**
- * @brief Add an element to the binary output
- * If the element is a number, it will therefore use an output size depending on
- * its value or for hexa on the string size.
- *
- * @param stype the element type (raw string, hexa, decimal,...)
- * @param etype the endianess of the output
- * @param s the string representing the element
- *
- * @exception BSExceptionBadType unable to interpret the element
- */
-void BS::BinStream::update_bin_output(const type_t stype,
-        const endianess_t etype, const std::string& s)
-{
-    const char *p;
-    size_t pos;
-    size_t pos2;
-    uint64_t val_u64;
-    std::string s2;
-    int size = 1;
-
-    p = s.c_str();
-
-    // string
-    if (stype == t_string)
-    {
-        m_output.insert(m_output.end(), p, p + s.size());
-        m_output_ready = true;
-    }
-
-    // number
-    else
-    {
-        int base;
-        if (stype == t_num_hexadecimal)
-        {
-            base = 16;
-        }
-        else if (stype == t_num_decimal)
-        {
-            base = 10;
-        }
-        else if (stype == t_num_octal)
-        {
-            base = 8;
-        }
-        else if (stype == t_num_binary)
-        {
-            base = 2;
-        }
-        else
-        {
-            throw BSExceptionBadType(stype);
-        }
-
-        // check if size is provided
-        pos = s.find('[');
-        if (pos != std::string::npos)
-        {
-            pos2 = s.find(']');
-            if (pos2 == std::string::npos)
-            {
-                pos2 = s.size();
-            }
-            s2 = s.substr(pos + 1, pos2 - 1);
-            size = std::stoul(s, 0, 10);
-        }
-        // convert from ascii to number
-        val_u64 = (uint64_t)std::stoul(s, 0, base);
-        p = (char*)&val_u64;
-
-        // big-endian
-        if (etype == big_endian)
-        {
-            if ((size == 8) || (val_u64 > MAX_U32b_VALUE) ||
-                    ((stype == t_num_hexadecimal) && (s.size() > 8)))
-            {
-                m_output.push_back(p[7]);
-                m_output.push_back(p[6]);
-                m_output.push_back(p[5]);
-                m_output.push_back(p[4]);
-            }
-            if ((size >= 4) || (val_u64 > MAX_U16b_VALUE) ||
-                    ((stype == t_num_hexadecimal) && (s.size() > 4)))
-            {
-                m_output.push_back(p[3]);
-                m_output.push_back(p[2]);
-            }
-            if ((size >= 2) || (val_u64 > MAX_U8b_VALUE) ||
-                    ((stype == t_num_hexadecimal) && (s.size() > 2)))
-            {
-                m_output.push_back(p[1]);
-                m_output.push_back(p[0]);
-            }
-            else
-            {
-                m_output.push_back(p[0]);
-            }
-            m_output_ready = true;
-        }
-        // little-endian
-        else
-        {
-            if ((size >= 2) || (val_u64 > MAX_U8b_VALUE) ||
-                    ((stype == t_num_hexadecimal) && (s.size() > 2)))
-            {
-                m_output.push_back(p[0]);
-                m_output.push_back(p[1]);
-            }
-            else
-            {
-                m_output.push_back(p[0]);
-            }
-            if ((size >= 4) || (val_u64 > MAX_U16b_VALUE) ||
-                    ((stype == t_num_hexadecimal) && (s.size() > 4)))
-            {
-                m_output.push_back(p[2]);
-                m_output.push_back(p[3]);
-            }
-            if ((size == 8) || (val_u64 > MAX_U32b_VALUE) ||
-                    ((stype == t_num_hexadecimal) && (s.size() > 8)))
-            {
-                m_output.push_back(p[4]);
-                m_output.push_back(p[5]);
-                m_output.push_back(p[6]);
-                m_output.push_back(p[7]);
-            }
-            m_output_ready = true;
-        }
-    }
-}
 
 void BS::BinStream::set_verbosity(bool verbose)
 {
