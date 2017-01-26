@@ -9,14 +9,12 @@
 using namespace BS;
 using namespace std;
 
-TEST_CASE( "Check Workflow", "[binstream]" )
+TEST_CASE( "Check internal", "[binstream]" )
 {
-    SECTION ( "actions")
+    SECTION ( "Unit test of 'update_internal'")
     {
-        BinStream b(true);
-        vector<char> output;
-        b << "little-endian"
-            << " 0001";
+        BinStream b;
+        b << "little-endian 0001";
         REQUIRE( b.update_internal("big-endian") );
         b << " 0203";
         REQUIRE( b.size() == 4);
@@ -25,6 +23,24 @@ TEST_CASE( "Check Workflow", "[binstream]" )
         REQUIRE( b[2] == 0x02 );
         REQUIRE( b[3] == 0x03 );
 
+    }
+
+    SECTION ( "Unit test of 'proceed_input'")
+    {
+        BinStream b(true);
+        string s;
+        
+        s = "little-endian 0001\n# this is a comment\nbig-endian 0203\n'abc'";
+        b.proceed_input(s);
+        vector<char> output;
+        REQUIRE( b.size() == 7);
+        REQUIRE( b[0] == 0x01 );
+        REQUIRE( b[1] == 0x00 );
+        REQUIRE( b[2] == 0x02 );
+        REQUIRE( b[3] == 0x03 );
+        REQUIRE( b[4] == 'a' );
+        REQUIRE( b[5] == 'b' );
+        REQUIRE( b[6] == 'c' );
     }
 }
 
