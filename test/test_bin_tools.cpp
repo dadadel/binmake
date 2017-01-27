@@ -122,14 +122,13 @@ TEST_CASE("Unit Tests of bin_tools functions")
         REQUIRE( check_grammar("%b01101[8]", t_num_binary) );
     }
 
-
-    SECTION("Unit test of 'build_number()'")
+    SECTION("Unit test of 'extract_number()'")
     {
         string s;
         number_t num;
 
         s = "-42";
-        REQUIRE( build_number(s, num, t_num_decimal, big_endian, 4) );
+        REQUIRE( extract_number(s, num, t_num_decimal, big_endian, 4) );
         REQUIRE( num.is_set );
         REQUIRE( num.endianess == big_endian );
         REQUIRE( num.size == 4 );
@@ -137,7 +136,7 @@ TEST_CASE("Unit Tests of bin_tools functions")
         REQUIRE( num.value_i64 == -42 );
 
         s = "42";
-        REQUIRE( build_number(s, num, t_num_decimal, big_endian) );
+        REQUIRE( extract_number(s, num, t_num_decimal, big_endian) );
         REQUIRE( num.is_set );
         REQUIRE( num.endianess == big_endian );
         REQUIRE( num.size == 1 );
@@ -145,20 +144,20 @@ TEST_CASE("Unit Tests of bin_tools functions")
         REQUIRE( num.value_u64 == 42 );
 
         s = "%xa42";
-        REQUIRE( build_number(s, num, t_num_hexadecimal, big_endian) );
+        REQUIRE( extract_number(s, num, t_num_hexadecimal, big_endian) );
         REQUIRE( num.is_set );
         REQUIRE( num.endianess == big_endian );
         REQUIRE( num.size == 2 );
         REQUIRE( !num.num_signed );
         REQUIRE( num.value_u64 == 0x0a42 );
 
-        REQUIRE( build_number(s, num, t_num_hexadecimal, little_endian) );
+        REQUIRE( extract_number(s, num, t_num_hexadecimal, little_endian) );
         REQUIRE( num.is_set );
         REQUIRE( num.endianess == little_endian );
         REQUIRE( num.value_u64 == 0x0a42 );
 
         s = "000a42";
-        REQUIRE( build_number(s, num, t_num_hexadecimal, big_endian) );
+        REQUIRE( extract_number(s, num, t_num_hexadecimal, big_endian) );
         REQUIRE( num.is_set );
         REQUIRE( num.endianess == big_endian );
         REQUIRE( num.size == 4 );
