@@ -38,8 +38,8 @@ bool BS::check_grammar(const std::string & element, type_t elem_type)
         pattern = R"((%b)?[01]+(\[\d+\])?)";
         ret = std::regex_match(element, pattern);
         break;
-    case t_action:
-        ret = is_action(element);
+    case t_internal_state:
+        ret = is_internal_state(element);
         break;
     case t_none:
         //TODO
@@ -108,10 +108,10 @@ BS::type_t BS::get_type(const std::string & element)
 
     else
     {
-        // Element is an action
-        if (is_action(element))
+        // Element is an internal state
+        if (is_internal_state(element))
         {
-            ret = t_action;
+            ret = t_internal_state;
         }
     }
 
@@ -146,52 +146,15 @@ void BS::add_number_to_vector_char(std::vector<char> & v, const number_t number)
 }
 
 /**
- * @brief Check if an element is an internal state action
+ * @brief Check if an element is an internal state
  *
  * @param element the string element to check
- * @return true if is an action
+ * @return true if is an internal state
  */
-bool BS::is_action(const std::string & element)
+bool BS::is_internal_state(const std::string & element)
 {
-    bool ret = false;
-    std::string s(element);
-
-    strip(s);
-
-    // check endianess
-
-    if ((s == "little-endian") || (s == "big-endian"))
-    {
-        ret = true;
-    }
-
-    // check number type
-
-    else if ((s == "hexadecimal") || (s == "hexa") || (s == "hex"))
-    {
-        ret = true;
-    }
-    else if ((s == "decimal") || (s == "dec"))
-    {
-        ret = true;
-    }
-    else if ((s == "octal") || (s == "oct"))
-    {
-        ret = true;
-    }
-    else if ((s == "binary") || (s == "bin"))
-    {
-        ret = true;
-    }
-
-    // check size
-
-    else if (starts_with(s, "size"))
-    {
-        ret = true;
-    }
-
-    return ret;
+    state_type_t tmp_state;
+    return get_state_type(element, tmp_state);
 }
 
 /**
