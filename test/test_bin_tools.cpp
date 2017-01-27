@@ -8,7 +8,7 @@
 using namespace std;
 using namespace BS;
 
-TEST_CASE("Test of bin_tools functions")
+TEST_CASE("Unit Tests of bin_tools functions")
 {
     SECTION("Unit test of 'get_type()'")
     {
@@ -205,4 +205,111 @@ TEST_CASE("Test of bin_tools functions")
         REQUIRE( v.data()[2] == 0x11 );
         REQUIRE( v.data()[3] == 0x00 );
    }
+
+    SECTION("Unit test of 'set_endianess()'")
+    {
+        endianess_t endian;
+
+        REQUIRE ( set_endianess("little-endian", endian) );
+        REQUIRE ( endian == little_endian);
+        REQUIRE ( set_endianess("big-endian", endian) );
+        REQUIRE ( endian == big_endian);
+
+        REQUIRE ( set_endianess("little_endian", endian) == false );
+        REQUIRE ( set_endianess("little endian", endian) == false );
+        REQUIRE ( set_endianess("middle-endian", endian) == false );
+        REQUIRE ( set_endianess("blabla", endian) == false );
+    }
+
+    SECTION("Unit test of 'set_number_type()'")
+    {
+        type_t num_type;
+
+        REQUIRE( set_number_type("hexadecimal", num_type) );
+        REQUIRE( num_type == t_num_hexadecimal );
+        REQUIRE( set_number_type("hexa", num_type) );
+        REQUIRE( num_type == t_num_hexadecimal );
+        REQUIRE( set_number_type("hex", num_type) );
+        REQUIRE( num_type == t_num_hexadecimal );
+        REQUIRE( set_number_type("decimal", num_type) );
+        REQUIRE( num_type == t_num_decimal );
+        REQUIRE( set_number_type("dec", num_type) );
+        REQUIRE( num_type == t_num_decimal );
+        REQUIRE( set_number_type("octal", num_type) );
+        REQUIRE( num_type == t_num_octal );
+        REQUIRE( set_number_type("oct", num_type) );
+        REQUIRE( num_type == t_num_octal );
+        REQUIRE( set_number_type("binary", num_type) );
+        REQUIRE( num_type == t_num_binary );
+        REQUIRE( set_number_type("bin", num_type) );
+        REQUIRE( num_type == t_num_binary );
+
+        REQUIRE( set_number_type("hexadec", num_type) == false );
+        REQUIRE( set_number_type("blabla", num_type) == false );
+        REQUIRE( set_number_type("b", num_type) == false );
+    }
+
+    SECTION("Unit test of 'get_state_type()'")
+    {
+        state_type_t state;
+
+        REQUIRE( get_state_type("little-endian", state) );
+        REQUIRE( state == t_state_type_endianess );
+        REQUIRE( get_state_type("big-endian", state) );
+        REQUIRE( state == t_state_type_endianess );
+
+        REQUIRE( get_state_type("hexadecimal", state) );
+        REQUIRE( state == t_state_type_number );
+        REQUIRE( get_state_type("hexa", state) );
+        REQUIRE( state == t_state_type_number );
+        REQUIRE( get_state_type("hex", state) );
+        REQUIRE( state == t_state_type_number );
+        REQUIRE( get_state_type("decimal", state) );
+        REQUIRE( state == t_state_type_number );
+        REQUIRE( get_state_type("dec", state) );
+        REQUIRE( state == t_state_type_number );
+        REQUIRE( get_state_type("octal", state) );
+        REQUIRE( state == t_state_type_number );
+        REQUIRE( get_state_type("oct", state) );
+        REQUIRE( state == t_state_type_number );
+        REQUIRE( get_state_type("binary", state) );
+        REQUIRE( state == t_state_type_number );
+        REQUIRE( get_state_type("bin", state) );
+        REQUIRE( state == t_state_type_number );
+
+        REQUIRE( get_state_type("size[2]", state) );
+        REQUIRE( state == t_state_type_size );
+        REQUIRE( get_state_type("size[0]", state) );
+        REQUIRE( state == t_state_type_size );
+
+        REQUIRE( get_state_type("size", state) == false );
+        REQUIRE( get_state_type("middle-endian", state) == false );
+        REQUIRE( get_state_type("blabla", state) == false );
+        REQUIRE( get_state_type("deci", state) == false );
+    }
+
+    SECTION("Unit test of 'set_size()'")
+    {
+        int size;
+
+        REQUIRE( set_size("size[1]", size) );
+        REQUIRE( size == 1 );
+        REQUIRE( set_size("size[2]", size) );
+        REQUIRE( size == 2 );
+        REQUIRE( set_size("size[4]", size) );
+        REQUIRE( size == 4 );
+        REQUIRE( set_size("size[8]", size) );
+        REQUIRE( size == 8 );
+        REQUIRE( set_size("size[0]", size) );
+        REQUIRE( size == 0 );
+
+        REQUIRE( set_size("size[16]", size) == false);
+        REQUIRE( set_size("size[3]", size) == false);
+        REQUIRE( set_size("size[5]", size) == false);
+        REQUIRE( set_size("size[6]", size) == false);
+        REQUIRE( set_size("size[]", size) == false);
+        REQUIRE( set_size("size [1]", size) == false);
+        REQUIRE( set_size("size 1", size) == false);
+        REQUIRE( set_size("size1", size) == false);
+    }
 }
