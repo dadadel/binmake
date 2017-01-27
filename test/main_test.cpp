@@ -115,5 +115,43 @@ TEST_CASE( "Check success to make binary", "[binstream]" )
         REQUIRE( b[5] == 0x00 );
     }
 
-    //TODO test hex zero padded size
+    SECTION( "test exemple.txt data conversion" )
+    {
+        BinStream b;
+        uint8_t exemple_bin[43] = {0x00, 0x11, 0x22, 0x33, 0x4d, 0xe0, 0x77, 0x66,
+                              0x55, 0x44, 0x88, 0x99, 0xaa, 0xbb, 0x7b, 0x7b,
+                              0x00, 0x00, 0x00, 0x74, 0x68, 0x69, 0x73, 0x20,
+                              0x69, 0x73, 0x20, 0x73, 0x6f, 0x6d, 0x65, 0x20,
+                              0x72, 0x61, 0x77, 0x20, 0x73, 0x74, 0x72, 0x69,
+                              0x6e, 0x67, 0xff};
+
+        b << "# an exemple of file description of binary data to generate\n"
+            << "\n"
+            << "# set endianess to big-endian\n"
+            << "big-endian\n" << "\n"
+            << "# default number is hexadecimal\n"
+            << "00112233\n" << "\n"
+            << "# man can explicit a number type: %b means binary number\n"
+            << "%b0100110111100000\n" << "\n"
+            << "# change endianess to little-endian\n"
+            << "little-endian\n" << "\n"
+            << "# if no explicit, use default\n"
+            << "44556677\n" << "\n"
+            << "# bytes are not concerned by endianess\n"
+            << "88 99 aa bb\n" << "\n"
+            << "# change default to decimal\n"
+            << "decimal\n" << "\n"
+            << "# following number is now decimal on one byte due to its value\n"
+            << "0123\n" << "\n"
+            << "# following number is now decimal forced to 4 bytes\n"
+            << "0123[4]\n" << "\n"
+            << "# strings are delimited by \" or '\n"
+            << "\"this is some raw string\"\n" << "\n"
+            << "# explicit hexa number starts with %x\n"
+            << "%xff\n";
+        for (int i = 0; i < 43; i++)
+        {
+            REQUIRE( (uint8_t)b[i] == exemple_bin[i] );
+        }
+    }
 }
