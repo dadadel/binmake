@@ -314,7 +314,7 @@ bool BS::extract_number_type(const std::string & str_num, type_t & num_type)
  * size will be ignored if a size is explicitly provided (e.g. "12[4]" -> size 4)
  * @return true if the number was extracted else false
  */
-bool BS::build_number(const std::string & element, number_t  & number,
+bool BS::extract_number(const std::string & element, number_t  & number,
         const type_t elem_type, const endianess_t endian, const int elem_size)
 {
     bool ret(true);
@@ -506,12 +506,3 @@ bool BS::build_number(const std::string & element, number_t  & number,
     return ret;
 }
 
-/**
- * @brief Extract to a string a number from binary data. The string is built
- * following a representation provided in a string description
- */
-void BS::extract_number(std::string & str_number, const std::vector<char> element,
-        const std::string & description, const endianess_t & endianess, const int size)
-{
-    //TODO
-}

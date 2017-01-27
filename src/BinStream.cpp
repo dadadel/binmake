@@ -375,7 +375,7 @@ void BS::BinStream::workflow(const std::string & element)
         /* no break */
     // number
     default:
-        if(build_number(element, number, elem_type, m_curr_endianess, m_curr_size))
+        if(extract_number(element, number, elem_type, m_curr_endianess, m_curr_size))
         {
             // update the binary output
             if (number.is_set)
