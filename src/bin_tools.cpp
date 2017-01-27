@@ -236,7 +236,7 @@ bool BS::get_state_type(const std::string & element, state_type_t & state_type)
 
     // check size
 
-    else if (starts_with(s, "size"))
+    else if (starts_with(s, "size["))
     {
         state_type = t_state_type_size;
     }
