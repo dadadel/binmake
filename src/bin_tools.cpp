@@ -303,12 +303,13 @@ bool BS::extract_number_type(const std::string & str_num, type_t & num_type)
 
 
 /**
- * @brief Build a number represented in a string.
+ * @brief Extract a number from a string.
  *
  * @param element the string representing the number
- * @param number will store the extracted number
+ * @param number structure will store the extracted number
  * @param elem_type the supposed type of the element (should be a number type)
- * @param size the size in bytes of the target element. If 0 will determine
+ * @param endian the endianess will be copied in the number structure
+ * @param elem_size the size in bytes of the target element. If 0 will determine
  * a size based on its value if decimal or octal or the number of characters
  * if hexadecimal or binary (default 0)
  * size will be ignored if a size is explicitly provided (e.g. "12[4]" -> size 4)
