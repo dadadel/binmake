@@ -168,41 +168,35 @@ bool BS::get_state_type(const std::string & element, state_type_t & state_type)
 {
     bool ret = true;
     std::string s(element);
+    type_t tmp_type;
+    endianess_t tmp_endian;
+    int tmp_size = -1;
 
     strip(s);
 
     // check endianess
 
-    if ((s == "little-endian") || (s == "big-endian"))
+    if (extract_endianess(s, tmp_endian))
     {
         state_type = t_state_type_endianess;
     }
 
     // check number type
-
-    else if ((s == "hexadecimal") || (s == "hexa") || (s == "hex"))
-    {
-        state_type = t_state_type_number;
-    }
-    else if ((s == "decimal") || (s == "dec"))
-    {
-        state_type = t_state_type_number;
-    }
-    else if ((s == "octal") || (s == "oct"))
-    {
-        state_type = t_state_type_number;
-    }
-    else if ((s == "binary") || (s == "bin"))
+    else if (extract_number_type(s, tmp_type))
     {
         state_type = t_state_type_number;
     }
 
     // check size
-
-    else if (starts_with(s, "size["))
+    else if (extract_size(s, tmp_size))
     {
         state_type = t_state_type_size;
     }
+    else if (tmp_size != -1)
+    {
+        state_type = t_state_type_size;
+    }
+
     else
     {
         ret = false;
@@ -217,10 +211,10 @@ bool BS::get_state_type(const std::string & element, state_type_t & state_type)
  *
  * @param str_size the string containing the state with the size
  * @param size will contain the extracted size
- * @return true if success else false
+ * @return true if success else false (size can be set with if bad value)
  */
 
-bool BS::set_size(const std::string & str_size, int & size)
+bool BS::extract_size(const std::string & str_size, int & size)
 {
     bool ret(false);
     std::string s;
@@ -241,6 +235,8 @@ bool BS::set_size(const std::string & str_size, int & size)
         }
         else
         {
+            // the bad value will be returned
+            size = value;
             error_message("Bad size " + std::to_string(value) + " for default size. Should be 0, 1, 2, 4 or 8");
         }
     }
@@ -254,7 +250,7 @@ bool BS::set_size(const std::string & str_size, int & size)
  * @param endianess will contain the endianess
  * @true if success else false
  */
-bool BS::set_endianess(const std::string & str_endian, endianess_t & endianess)
+bool BS::extract_endianess(const std::string & str_endian, endianess_t & endianess)
 {
     bool ret(true);
     if (str_endian == "little-endian")
@@ -279,7 +275,7 @@ bool BS::set_endianess(const std::string & str_endian, endianess_t & endianess)
  * @param num_type will contain the number type
  * @true if success else false
  */
-bool BS::set_number_type(const std::string & str_num, type_t & num_type)
+bool BS::extract_number_type(const std::string & str_num, type_t & num_type)
 {
     bool ret(true);
     if ((str_num == "hexadecimal") || (str_num == "hexa") || (str_num == "hex"))
@@ -496,26 +492,15 @@ bool BS::build_number(const std::string & element, number_t  & number,
             number.value_u64 = val_u64;
             number.num_signed = false;
         }
-        number.size = size;
-        switch(size)
+        if ((size != 1) && (size != 2) && (size != 4) && (size != 8))
         {
-        case 1:
-            number.type = t_8bits;
-            break;
-        case 2:
-            number.type = t_16bits;
-            break;
-        case 4:
-            number.type = t_32bits;
-            break;
-        case 8:
-            number.type = t_64bits;
-            break;
-        default:
             ret = false;
             number.is_set = false;
             error_message("Unexpected size !");
-            break;
+        }
+        else
+        {
+            number.size = size;
         }
     }
     return ret;
@@ -526,8 +511,7 @@ bool BS::build_number(const std::string & element, number_t  & number,
  * following a representation provided in a string description
  */
 void BS::extract_number(std::string & str_number, const std::vector<char> element,
-        const std::string & description, const type_number_t & element_type,
-        const endianess_t & endianess, const int size)
+        const std::string & description, const endianess_t & endianess, const int size)
 {
     //TODO
 }

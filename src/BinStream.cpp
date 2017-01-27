@@ -346,7 +346,7 @@ void BS::BinStream::workflow(const std::string & element)
     {
     case t_error:
         //TODO
-        bs_log("Error in workflow: bad element type");
+        bs_error("Error in workflow: bad element type");
         break;
     // internal state
     case t_internal_state:
@@ -409,18 +409,18 @@ bool BS::BinStream::update_internal_state(const std::string & element)
     {
     // update endianess
     case t_state_type_endianess:
-        set_endianess(s, m_curr_endianess);
+        extract_endianess(s, m_curr_endianess);
         break;
 
     // update number type
     case t_state_type_number:
-        set_number_type(s, m_curr_numbers);
+        extract_number_type(s, m_curr_numbers);
         break;
 
     // update size
     case t_state_type_size:
         // extract the size
-        if (!set_size(s, m_curr_size))
+        if (!extract_size(s, m_curr_size))
         {
             ret = false;
             bs_log("Failed to extract size from string '" + s + "'");

@@ -36,15 +36,6 @@ namespace BS
 
     typedef enum
     {
-        t_8bits,
-        t_16bits,
-        t_32bits,
-        t_64bits,
-        t_number_error
-    } type_number_t;
-
-    typedef enum
-    {
         little_endian,
         big_endian
     } endianess_t;
@@ -52,9 +43,8 @@ namespace BS
     typedef struct
     {
         bool is_set;
-        type_number_t type;
         endianess_t endianess;
-        int size;
+        int size; /** size in bytes (0, 1, 2, 4 or 8) */
         bool num_signed;
         union
         {
