@@ -64,7 +64,7 @@ namespace BS
         friend std::istream& operator>>(std::istream& stream, BinStream& bin_stream);
 
         // Low-level functions for parsing input and generating output
-        bool update_internal(const std::string & element);
+        bool update_internal_state(const std::string & element);
         void proceed_input(const std::string & element);
         void workflow(const std::string & element);
 

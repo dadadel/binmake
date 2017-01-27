@@ -348,9 +348,9 @@ void BS::BinStream::workflow(const std::string & element)
         //TODO
         bs_log("Error in workflow: bad element type");
         break;
-    // action
-    case t_action:
-        update_internal(element);
+    // internal state
+    case t_internal_state:
+        update_internal_state(element);
         break;
     // string
     case t_string:
@@ -393,7 +393,7 @@ void BS::BinStream::workflow(const std::string & element)
  * @brief Update internal state
  * @return true if success else false
  */
-bool BS::BinStream::update_internal(const std::string & element)
+bool BS::BinStream::update_internal_state(const std::string & element)
 {
     bool ret(true);
     std::string s(element);
@@ -428,7 +428,7 @@ bool BS::BinStream::update_internal(const std::string & element)
         break;
 
     default:
-        bs_log("Unknown state action '" + s + "'");
+        bs_log("Unknown internal state '" + s + "'");
         ret = false;
         break;
     }

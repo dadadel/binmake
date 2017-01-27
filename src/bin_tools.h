@@ -16,7 +16,7 @@
 
 namespace BS
 {
-bool is_action(const std::string & element);
+bool is_internal_state(const std::string & element);
 type_t get_type(const std::string & element);
 bool get_state_type(const std::string & element, state_type_t & state_type);
 bool check_grammar(const std::string & element, type_t elem_type);

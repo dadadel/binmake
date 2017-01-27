@@ -29,7 +29,7 @@ namespace BS
         t_num_octal,
         t_num_binary,
         t_string,
-        t_action,
+        t_internal_state,
         t_none,
         t_error
     } type_t;

@@ -11,11 +11,11 @@ using namespace std;
 
 TEST_CASE( "Check internal", "[binstream]" )
 {
-    SECTION ( "Unit test of 'update_internal'")
+    SECTION ( "Unit test of 'update_internal_state'")
     {
         BinStream b;
         b << "little-endian 0001";
-        REQUIRE( b.update_internal("big-endian") );
+        REQUIRE( b.update_internal_state("big-endian") );
         b << " 0203";
         REQUIRE( b.size() == 4);
         REQUIRE( b[0] == 0x01 );
