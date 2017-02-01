@@ -16,6 +16,7 @@ to include to you programs.
   * [How to use the binary](#how-to-use-the-binary)
   * [How to include in C++ code](#how-to-include-in-c-code)
   * [Brief formatting documentation](#brief-formatting-documentation)
+  * [Offer a coffee or a beer](#offer-a-coffee-or-a-beer)
   * [TODO](#todo)
 
 ## How to install
@@ -41,6 +42,7 @@ After compiling, the folder tree looks like:
 |
 |-- include/
 |     |-- bs_exception.h
+|     |-- bs_data.h
 |     |-- BinStream.h
 |
 |-- lib/
@@ -321,9 +323,16 @@ If one of these keywords is found, then all furthur found number without an
 explicit interpretation will be interpreted as a **binary number**.
 
 
+## Offer a coffee or a beer
+
+If you enjoyed this free software, and want to thank me, you can offer me some
+bitcoins for a coffee, a beer, or more, I would be happy :)
+
+Here's my address for bitcoins : 1PbzmiF9o46HXZWz3TkXrpafPg4x5uS686
+
+
 ## TODO
 
-- Manage float/double numbers.
-- Update tests (broken) and cover all functions
+- Manage float/double numbers
 - Manage several string lines
-- Manage formatting syntax errors (writting `%a` instead of `%xa` will crash)
+
