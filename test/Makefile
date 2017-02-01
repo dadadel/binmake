@@ -3,6 +3,7 @@ SRC_PATH=../src
 INC_PATH=../include
 SOURCES = main_test.cpp \
           test_bin_tools.cpp \
+          test_issues.cpp \
           $(SRC_PATH)/BinStream.cpp \
           $(SRC_PATH)/bin_tools.cpp \
           $(SRC_PATH)/utils.cpp
