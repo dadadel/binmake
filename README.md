@@ -51,6 +51,19 @@ After compiling, the folder tree looks like:
 |
 |-- bin/
 |     |-- binmake
+|
+|-- test/ <unit tests>
+```
+
+### Tests
+
+Note that `BinStream` (and low-level functions) is well covered by unit tests.
+The used framework is [Catch](https://github.com/philsquared/Catch).
+
+To run the tests, just launch:
+
+```bash
+$ make run-tests
 ```
 
 ## How to use the binary
@@ -236,16 +249,6 @@ int main()
     }
     return 0;
 }
-```
-
-### Tests
-
-Note that `BinStream` (and low-level functions) is well covered by unit tests.
-
-To run the tests, just launch:
-
-```bash
-$ make run-tests
 ```
 
 ## Brief formatting documentation
