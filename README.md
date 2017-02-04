@@ -238,6 +238,16 @@ int main()
 }
 ```
 
+### Tests
+
+Note that `BinStream` (and low-level functions) is well covered by unit tests.
+
+To run the tests, just launch:
+
+```bash
+$ make run-tests
+```
+
 ## Brief formatting documentation
 
 ### Comments

@@ -8,8 +8,8 @@ all:
 test:
 	make -C $(TEST_PATH)
 
-run-test: test
-	make -C $(TEST_PATH) run-test
+run-tests: test
+	make -C $(TEST_PATH) run-tests
 
 clean:
 	make -C $(SRC_PATH) clean

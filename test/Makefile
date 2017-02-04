@@ -10,6 +10,8 @@ SOURCES = main_test.cpp \
 TARGET = $(BIN_PATH)/test_binmake
 OBJECTS=$(notdir $(SOURCES:.cpp=.o))
 
+$(shell mkdir -p $(BIN_PATH))
+
 CXX=g++
 CFLAGS = -std=c++11 -Wall -Wextra -I$(INC_PATH) -I. -I$(SRC_PATH)
 LDFLAGS =
@@ -25,7 +27,7 @@ $(TARGET): $(OBJECTS)
 %.o: %.cpp
 	$(CXX) -o $@ -c $< $(INC) $(CFLAGS)
 
-run-test: $(TARGET)
+run-tests: $(TARGET)
 	$(TARGET)
 
 clean:
