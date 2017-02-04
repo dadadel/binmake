@@ -1,0 +1,6 @@
+v0.2: rewrite all code
+    - more modularity
+    - fix size (issue #1)
+    - use regular expressions
+
+v0.1: first version
