@@ -82,6 +82,10 @@ $ cat exemple.txt | ./binmake -o exemple.bin
 $ echo '32 decimal 32 %x61 61' | ./binmake | hexdump -C
 00000000  32 20 61 3d                                       |2 a=|
 00000004
+
+$ echo 'big-endian %f1.2345' | ./bin/binmake | hexdump -C
+00000000  3f 9e 04 19                                       |?...|
+00000004
 ```
 
 - Input file `exemple.txt`:
@@ -272,7 +276,8 @@ be in hexadecimal representation unless the default representation is changed.
 To force interpretation of a number representation, it should start with one of
 the following prefix:
 - `%x` represents hexadecimal number (digits in [0-9a-fA-F])
-- `%d` represents decimal number (digits in [0-9])
+- `%d` represents decimal number (digits in [0-9] starting optionnaly by[+-])
+- `%f` represents decimal number (chars in [+-eE.0-9])
 - `%o` represents octal number (digits in [0-7])
 - `%b` represents binary number (digits in [0-1])
 
@@ -284,6 +289,10 @@ As exception, if a hexadecimal number is provided with non-significant zeros,
 the size of the string representation will determine the output binary number
 size. Thus, "%x0000" (or "0000" if default is hexa) will generate a 16 bits
 number instead of 8 bits.
+
+An other exception is that float numbers can only be represented on 32 bits for
+float or 64 bits for double (thus 4 or 8 bytes). Default float representation
+used if not specified is 4 bytes.
 
 Furthermore, it is possible to force a size for a number of any type by adding
 the size in bytes between brackets (2, 4 or 8). For instance, the decimal number
@@ -335,6 +344,10 @@ explicit interpretation will be interpreted as a **octal number**.
 If one of these keywords is found, then all furthur found number without an
 explicit interpretation will be interpreted as a **binary number**.
 
+- `float`
+
+If this keyword is found all further numbers without and explicit interpretation
+will be interpreted as a **float number**.
 
 ## Offer a coffee or a beer
 
@@ -346,6 +359,5 @@ Here's my address for bitcoins : 1PbzmiF9o46HXZWz3TkXrpafPg4x5uS686
 
 ## TODO
 
-- Manage float/double numbers
 - Manage several string lines
 

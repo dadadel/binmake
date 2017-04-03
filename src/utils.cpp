@@ -98,3 +98,12 @@ void BS::error_message(const std::string & msg)
 {
     std::cerr << msg << std::endl;
 }
+
+/**
+ * @brief Print a message in error output prefixed by "WARNING:"
+ * @param msg the message to print in error output
+ */
+void BS::warning_message(const std::string & msg)
+{
+    std::cerr << "WARNING: " << msg << std::endl;
+}

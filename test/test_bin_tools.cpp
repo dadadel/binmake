@@ -34,6 +34,8 @@ TEST_CASE("Unit Tests of bin_tools functions")
         REQUIRE( get_type("%d-023") == t_num_decimal );
         REQUIRE( get_type("%o023") == t_num_octal );
         REQUIRE( get_type("%b01101") == t_num_binary );
+        REQUIRE( get_type("%f12.5") == t_num_float );
+        REQUIRE( get_type("%f-0.12345") == t_num_float );
 
         // Not valid number
 
@@ -87,12 +89,19 @@ TEST_CASE("Unit Tests of bin_tools functions")
         REQUIRE( check_grammar("%x0a3", t_num_hexadecimal) );
         REQUIRE( check_grammar("%o023", t_num_octal) );
         REQUIRE( check_grammar("%b01101", t_num_binary) );
+        REQUIRE( check_grammar("%f12.5", t_num_float) );
+        REQUIRE( check_grammar("%f-0.12345", t_num_float) );
+        REQUIRE( check_grammar("%f5.e3", t_num_float) );
+        REQUIRE( check_grammar("%f5.145E-3", t_num_float) );
+        REQUIRE( check_grammar("%f5.145e+10", t_num_float) );
+        REQUIRE( check_grammar("%f5", t_num_float) );
 
         // Not valid grammar
         REQUIRE( check_grammar("%x0g23", t_num_hexadecimal) == false );
         REQUIRE( check_grammar("%d0a3", t_num_decimal) == false );
         REQUIRE( check_grammar("%o09", t_num_octal) == false );
         REQUIRE( check_grammar("%b01102", t_num_binary) == false );
+        REQUIRE( check_grammar("%f1a.2", t_num_float) == false );
 
         //////// Not explicit numbers /////////
 
@@ -120,6 +129,8 @@ TEST_CASE("Unit Tests of bin_tools functions")
         REQUIRE( check_grammar("%o47[1]", t_num_octal) );
         REQUIRE( check_grammar("%o947[1]", t_num_octal) == false );
         REQUIRE( check_grammar("%b01101[8]", t_num_binary) );
+        REQUIRE( check_grammar("%f-2.e8[4]", t_num_float) );
+        REQUIRE( check_grammar("%f23.5[8]", t_num_float) );
     }
 
     SECTION("Unit test of 'extract_number()'")
@@ -163,7 +174,28 @@ TEST_CASE("Unit Tests of bin_tools functions")
         REQUIRE( num.size == 4 );
         REQUIRE( !num.num_signed );
         REQUIRE( num.value_u64 == 0x0a42 );
-    }
+
+        s = "%f-2.5";
+        REQUIRE( extract_number(s, num, t_num_float, big_endian, 4) );
+        REQUIRE( num.is_set );
+        REQUIRE( num.endianess == big_endian );
+        REQUIRE( num.size == 4 );
+        REQUIRE( num.value_f32 == -2.5 );
+
+        s = "%f1.2345";
+        REQUIRE( extract_number(s, num, t_num_float, big_endian, 4) );
+        REQUIRE( num.is_set );
+        REQUIRE( num.endianess == big_endian );
+        REQUIRE( num.size == 4 );
+        REQUIRE( num.value_f32 == 1.2345f );
+
+        s = "%f14.23e-4[8]";
+        REQUIRE( extract_number(s, num, t_num_float, little_endian, 8) );
+        REQUIRE( num.is_set );
+        REQUIRE( num.endianess == little_endian );
+        REQUIRE( num.size == 8 );
+        REQUIRE( num.value_f64 == 14.23e-4 );
+}
 
     SECTION("Unit test of 'add_number_to_vector_char()'")
     {
@@ -174,10 +206,23 @@ TEST_CASE("Unit Tests of bin_tools functions")
         number.num_signed = false;
         number.value_u64 = 0x00112233;
 
+        // little-endian
+
+        number.endianess = little_endian;
+
+        add_number_to_vector_char(v, number);
+
+        REQUIRE( v.size() == 4 );
+        REQUIRE( v.data()[0] == 0x33 );
+        REQUIRE( v.data()[1] == 0x22 );
+        REQUIRE( v.data()[2] == 0x11 );
+        REQUIRE( v.data()[3] == 0x00 );
+
         // big-endian
 
         number.endianess = big_endian;
 
+        v.clear();
         add_number_to_vector_char(v, number);
 
         REQUIRE( v.size() == 4 );
@@ -186,18 +231,17 @@ TEST_CASE("Unit Tests of bin_tools functions")
         REQUIRE( v.data()[2] == 0x22 );
         REQUIRE( v.data()[3] == 0x33 );
 
-        // little-endian
+        // float number
 
-        number.endianess = little_endian;
-
+        number.value_f32 = 1.2345;
         v.clear();
         add_number_to_vector_char(v, number);
 
         REQUIRE( v.size() == 4 );
-        REQUIRE( v.data()[0] == 0x33 );
-        REQUIRE( v.data()[1] == 0x22 );
-        REQUIRE( v.data()[2] == 0x11 );
-        REQUIRE( v.data()[3] == 0x00 );
+        REQUIRE( v.data()[0] == 0x3F );
+        REQUIRE( v.data()[1] == (char)0x9E );
+        REQUIRE( v.data()[2] == 0x04 );
+        REQUIRE( v.data()[3] == 0x19 );
    }
 
     SECTION("Unit test of 'extract_endianess()'")
@@ -237,6 +281,8 @@ TEST_CASE("Unit Tests of bin_tools functions")
         REQUIRE( num_type == t_num_binary );
         REQUIRE( extract_number_type("bin", num_type) );
         REQUIRE( num_type == t_num_binary );
+        REQUIRE( extract_number_type("float", num_type) );
+        REQUIRE( num_type == t_num_float );
 
         REQUIRE( extract_number_type("hexadec", num_type) == false );
         REQUIRE( extract_number_type("blabla", num_type) == false );
@@ -269,6 +315,8 @@ TEST_CASE("Unit Tests of bin_tools functions")
         REQUIRE( get_state_type("binary", state) );
         REQUIRE( state == t_state_type_number );
         REQUIRE( get_state_type("bin", state) );
+        REQUIRE( state == t_state_type_number );
+        REQUIRE( get_state_type("float", state) );
         REQUIRE( state == t_state_type_number );
 
         REQUIRE( get_state_type("size[2]", state) );

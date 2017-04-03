@@ -19,6 +19,7 @@ namespace BS
     #define PREFIX_NUMBER_HEXADECIMAL "%x"
     #define PREFIX_NUMBER_BINARY "%b"
     #define PREFIX_NUMBER_OCTAL "%o"
+    #define PREFIX_NUMBER_FLOAT "%f"
 
     #define MAX_U32b_VALUE 0x00000000FFFFFFFFUL
     #define MAX_U16b_VALUE 0x000000000000FFFFUL
@@ -31,6 +32,7 @@ namespace BS
     bool endswith(const std::string &str, const std::string &suffix);
     void log_message(const std::string & msg);
     void error_message(const std::string & msg);
+    void warning_message(const std::string & msg);
 }
 
 class ExceptionBBInterpretation

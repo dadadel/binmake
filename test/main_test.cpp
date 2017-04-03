@@ -115,6 +115,18 @@ TEST_CASE( "Check success to make binary", "[binstream]" )
         REQUIRE( b[5] == 0x00 );
     }
 
+    SECTION( "- make a binary from a float number" )
+    {
+        b << "big-endian" <<
+                "%f1.2345[4]";
+        REQUIRE( b.output_ready());
+        REQUIRE( b.size() == 4);
+        REQUIRE( b[0] == 0x3f );
+        REQUIRE( b[1] == (char)0x9e );
+        REQUIRE( b[2] == 0x04 );
+        REQUIRE( b[3] == 0x19 );
+    }
+
     SECTION( "test exemple.txt data conversion" )
     {
         BinStream b;

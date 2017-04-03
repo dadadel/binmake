@@ -1,3 +1,5 @@
+v0.3: add float management
+
 v0.2: rewrite all code
     - more modularity
     - fix size (issue #1)

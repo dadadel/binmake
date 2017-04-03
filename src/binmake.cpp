@@ -14,7 +14,7 @@
 using namespace std;
 using namespace BS;
 
-static const string __version("V0.2");
+static const string __version("V0.3");
 
 void usage(std::string name)
 {

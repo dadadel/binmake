@@ -11,6 +11,10 @@
 
 #include <cstdint>
 
+// WARNING: this can be wrong. Supposing float is 32 bit and double 64 bits.
+typedef float float32_t;
+typedef double float64_t;
+
 namespace BS
 {
     typedef enum
@@ -28,6 +32,7 @@ namespace BS
         t_num_decimal,
         t_num_octal,
         t_num_binary,
+        t_num_float,
         t_string,
         t_internal_state,
         t_none,
@@ -50,6 +55,8 @@ namespace BS
         {
             uint64_t value_u64;
             int64_t value_i64;
+            float32_t value_f32;
+            float64_t value_f64;
         };
     } number_t;
 }

@@ -30,6 +30,10 @@ bool BS::check_grammar(const std::string & element, type_t elem_type)
         pattern = R"((%d)?[+-]?\d+(\[\d+\])?)";
         ret = std::regex_match(element, pattern);
         break;
+    case t_num_float:
+        pattern = R"((%f)?[+-]?\d+\.?\d*([eE][+-]?\d+)?(\[\d+\])?)";
+        ret = std::regex_match(element, pattern);
+        break;
     case t_num_octal:
         pattern = R"((%o)?[0-7]+(\[\d+\])?)";
         ret = std::regex_match(element, pattern);
@@ -68,7 +72,7 @@ BS::type_t BS::get_type(const std::string & element)
 
     if (starts_with(element, PREFIX_NUMBER))
     {
-        pattern = R"(%[dxbo]{1}\S+)";
+        pattern = R"(%[fdxbo]{1}\S+)";
         res_comp = std::regex_match(element, pattern);
         if (!res_comp)
         {
@@ -83,6 +87,10 @@ BS::type_t BS::get_type(const std::string & element)
             else if (starts_with(element, PREFIX_NUMBER_DECIMAL))
             {
                 ret = t_num_decimal;
+            }
+            else if (starts_with(element, PREFIX_NUMBER_FLOAT))
+            {
+                ret = t_num_float;
             }
             else if (starts_with(element, PREFIX_NUMBER_OCTAL))
             {
@@ -286,6 +294,10 @@ bool BS::extract_number_type(const std::string & str_num, type_t & num_type)
     {
         num_type = t_num_decimal;
     }
+    else if ((str_num == "float"))
+    {
+        num_type = t_num_float;
+    }
     else if ((str_num == "octal") || (str_num == "oct"))
     {
         num_type = t_num_octal;
@@ -326,6 +338,8 @@ bool BS::extract_number(const std::string & element, number_t  & number,
     std::smatch match;
     int64_t val_i64;
     uint64_t val_u64;
+    float32_t val_f32;
+    float64_t val_f64;
     unsigned int nb_char = 0;
     int size = elem_size;
 
@@ -352,6 +366,7 @@ bool BS::extract_number(const std::string & element, number_t  & number,
             nb_char = 2;
             break;
         case t_num_decimal:
+        case t_num_float:
             base = 10;
             break;
         case t_num_octal:
@@ -368,7 +383,7 @@ bool BS::extract_number(const std::string & element, number_t  & number,
         }
     }
     // extract the number part substring and eventually the size if explicit
-    pattern = R"((%\w{1})?([+-]?[\da-fA-F]+)(\[\d+\])?)";
+    pattern = R"((%\w{1})?([+-]?[\da-fA-F]+\.?\d*[eE]?[+-]?\d*)(\[\d+\])?)";
     if (!std::regex_search(element.begin(), element.end(), match, pattern))
     {
         error_message("Failed to parse element number '" + element + "'");
@@ -389,15 +404,49 @@ bool BS::extract_number(const std::string & element, number_t  & number,
     // convert ASCII to number
     if (ret)
     {
-        if (starts_with(s, "-"))
+        if (elem_type == t_num_float)
         {
-            num_signed = true;
-            val_i64 = (int64_t)std::stoll(s, 0, base);
+            // check size
+            if (size == 0)
+            {
+                size = 4;
+            }
+            else if ((size != 4) && (size != 8))
+            {
+                warning_message("Bad size " + std::to_string(size) + " for float number. Will use 4 bytes instead.");//TODO enhance
+                size = 4;
+            }
+            else
+            {
+                // nothing
+            }
+            // get the value
+            num_signed = false;
+            if (starts_with(s, "-"))
+            {
+                num_signed = true;
+            }
+            if (size == 4)
+            {
+                val_f32 = std::stof(s);
+            }
+            else
+            {
+                val_f64 = std::stod(s);
+            }
         }
         else
         {
-            num_signed = false;
-            val_u64 = (uint64_t)std::stoull(s, 0, base);
+            if (starts_with(s, "-"))
+            {
+                num_signed = true;
+                val_i64 = (int64_t)std::stoll(s, 0, base);
+            }
+            else
+            {
+                num_signed = false;
+                val_u64 = (uint64_t)std::stoull(s, 0, base);
+            }
         }
     }
     // determine size if still not done
@@ -424,6 +473,11 @@ bool BS::extract_number(const std::string & element, number_t  & number,
             {
                 size = 1;
             }
+            break;
+        // float : default is 4
+        case t_num_float:
+            warning_message("Float without size. This should not happen !");
+            size = 4;
             break;
         // decimal and octal depend on the value
         case t_num_decimal:
@@ -483,25 +537,47 @@ bool BS::extract_number(const std::string & element, number_t  & number,
     {
         number.is_set = true;
         number.endianess = endian;
-        if (num_signed)
-        {
-            number.value_i64 = val_i64;
-            number.num_signed = true;
-        }
-        else
-        {
-            number.value_u64 = val_u64;
-            number.num_signed = false;
-        }
-        if ((size != 1) && (size != 2) && (size != 4) && (size != 8))
-        {
-            ret = false;
-            number.is_set = false;
-            error_message("Unexpected size !");
-        }
-        else
+        if (elem_type == t_num_float)
         {
             number.size = size;
+            if (size == 4)
+            {
+                number.value_u64 = 0UL;
+                number.value_f32 = val_f32;
+            }
+            else if (size == 8)
+            {
+                number.value_f64 = val_f64;
+            }
+            else
+            {
+                error_message("Bad size " + std::to_string(size) + " for float number. At that step, this should never happen!");//TODO enhance
+                number.is_set = false;
+                ret = false;
+            }
+        }
+        else
+        {
+            if (num_signed)
+            {
+                number.value_i64 = val_i64;
+                number.num_signed = true;
+            }
+            else
+            {
+                number.value_u64 = val_u64;
+                number.num_signed = false;
+            }
+            if ((size != 1) && (size != 2) && (size != 4) && (size != 8))
+            {
+                ret = false;
+                number.is_set = false;
+                error_message("Unexpected size " + std::to_string(size) + " !"); // enhance
+            }
+            else
+            {
+                number.size = size;
+            }
         }
     }
     return ret;
