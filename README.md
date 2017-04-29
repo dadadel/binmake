@@ -277,7 +277,7 @@ To force interpretation of a number representation, it should start with one of
 the following prefix:
 - `%x` represents hexadecimal number (digits in [0-9a-fA-F])
 - `%d` represents decimal number (digits in [0-9] starting optionnaly by[+-])
-- `%f` represents decimal number (chars in [+-eE.0-9])
+- `%f` represents float number (chars in [+-eE.0-9])
 - `%o` represents octal number (digits in [0-7])
 - `%b` represents binary number (digits in [0-1])
 
