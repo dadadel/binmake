@@ -1,5 +1,6 @@
 #include <string>
 #include <regex>
+#include <cmath>
 #include "bs_data.h"
 #include "utils.h"
 #include "bin_tools.h"
@@ -489,9 +490,9 @@ bool BS::extract_number(const std::string & element, number_t  & number,
                 int64_t bits;
                 for (int i=2; i >= 0; i--)
                 {
-                    b = pow(2, i);
+                    b = std::pow(2, i);
                     n = b * 8;
-                    bits = pow(2, n-1);
+                    bits = std::pow(2, n-1);
                     // min (negative) and max values in bits
                     if ((val_i64 > (bits - 1)) || (val_i64 < (-bits)))
                     {
@@ -505,9 +506,9 @@ bool BS::extract_number(const std::string & element, number_t  & number,
                 for (int i=2; i >= 0; i--)
                 {
                     uint64_t ubits;
-                    b = pow(2, i);
+                    b = std::pow(2, i);
                     n = b * 8;
-                    ubits = pow(2, n);
+                    ubits = std::pow(2, n);
                     if (val_u64 > (ubits - 1))
                     {
                         size = b * 2;
