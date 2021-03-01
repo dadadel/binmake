@@ -29,7 +29,7 @@ TEST_CASE( "Check internal", "[binstream]" )
     {
         BinStream b(true);
         string s;
-        
+
         s = "little-endian 0001\n# this is a comment\nbig-endian 0203\n'abc'";
         b.proceed_input(s);
         vector<char> output;
@@ -127,17 +127,17 @@ TEST_CASE( "Check success to make binary", "[binstream]" )
         REQUIRE( b[3] == 0x19 );
     }
 
-    SECTION( "test exemple.txt data conversion" )
+    SECTION( "test example.txt data conversion" )
     {
         BinStream b;
-        uint8_t exemple_bin[43] = {0x00, 0x11, 0x22, 0x33, 0x4d, 0xe0, 0x77, 0x66,
+        uint8_t example_bin[43] = {0x00, 0x11, 0x22, 0x33, 0x4d, 0xe0, 0x77, 0x66,
                               0x55, 0x44, 0x88, 0x99, 0xaa, 0xbb, 0x7b, 0x7b,
                               0x00, 0x00, 0x00, 0x74, 0x68, 0x69, 0x73, 0x20,
                               0x69, 0x73, 0x20, 0x73, 0x6f, 0x6d, 0x65, 0x20,
                               0x72, 0x61, 0x77, 0x20, 0x73, 0x74, 0x72, 0x69,
                               0x6e, 0x67, 0xff};
 
-        b << "# an exemple of file description of binary data to generate\n"
+        b << "# an example of file description of binary data to generate\n"
             << "\n"
             << "# set endianess to big-endian\n"
             << "big-endian\n" << "\n"
@@ -163,7 +163,7 @@ TEST_CASE( "Check success to make binary", "[binstream]" )
             << "%xff\n";
         for (int i = 0; i < 43; i++)
         {
-            REQUIRE( (uint8_t)b[i] == exemple_bin[i] );
+            REQUIRE( (uint8_t)b[i] == example_bin[i] );
         }
     }
 }

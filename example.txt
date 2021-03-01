@@ -1,4 +1,4 @@
-# an exemple of file description of binary data to generate
+# an example of file description of binary data to generate
 
 # set endianess to big-endian
 big-endian
