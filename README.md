@@ -71,13 +71,13 @@ $ make run-tests
 ```bash
 $ mv bin/binmake .
 
-$ ./binmake exemple.txt exemple.bin
+$ ./binmake example.txt example.bin
 
-$ ./binmake exemple.txt > exemple.bin
+$ ./binmake example.txt > example.bin
 
-$ cat exemple.txt | ./binmake > exemple.bin
+$ cat example.txt | ./binmake > example.bin
 
-$ cat exemple.txt | ./binmake -o exemple.bin
+$ cat example.txt | ./binmake -o example.bin
 
 $ echo '32 decimal 32 %x61 61' | ./binmake | hexdump -C
 00000000  32 20 61 3d                                       |2 a=|
@@ -88,10 +88,10 @@ $ echo 'big-endian %f1.2345' | ./bin/binmake | hexdump -C
 00000004
 ```
 
-- Input file `exemple.txt`:
+- Input file `example.txt`:
 
 ```bash
-# an exemple of file description of binary data to generate
+# an example of file description of binary data to generate
 
 # set endianess to big-endian
 big-endian
@@ -127,7 +127,7 @@ decimal
 %xff
 ```
 
-- Output file`exemple.bin`:
+- Output file`example.bin`:
 
 ```
 00000000  00 11 22 33 4d e0 77 66  55 44 88 99 aa bb 7b 7b  |.."3M.wfUD....{{|

@@ -20,8 +20,8 @@ int main()
     stringstream ss;
 
     // from input file to output file
-    ifstream f("exemple.txt");
-    ofstream t("exemple_bs.bin");
+    ifstream f("example.txt");
+    ofstream t("example_bs.bin");
     b << f >> t;
     f.close();
     t.close();
